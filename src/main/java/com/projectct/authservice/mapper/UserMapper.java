@@ -1,7 +1,7 @@
 package com.projectct.authservice.mapper;
 
-import com.projectct.authservice.DTO.User.RegisterRequest;
-import com.projectct.authservice.DTO.User.UserResponse;
+import com.projectct.authservice.DTO.User.request.RegisterRequest;
+import com.projectct.authservice.DTO.User.response.UserResponse;
 import com.projectct.authservice.model.User;
 import org.mapstruct.Mapper;
 

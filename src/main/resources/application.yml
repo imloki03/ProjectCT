@@ -15,3 +15,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: ${JPA_DDL}
+
+# JWT config
+jwt:
+  secret_key: ${JWT_SECRET_KEY}
+  refreshable_time: ${JWT_RT_EXPIRED}
+  valid_time: ${JWT_AT_EXPIRED}

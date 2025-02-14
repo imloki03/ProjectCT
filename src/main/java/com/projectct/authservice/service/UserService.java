@@ -1,11 +1,12 @@
 package com.projectct.authservice.service;
 
-import com.projectct.authservice.DTO.User.LoginRequest;
-import com.projectct.authservice.DTO.User.RegisterRequest;
-import com.projectct.authservice.DTO.User.UserResponse;
+import com.projectct.authservice.DTO.User.request.LoginRequest;
+import com.projectct.authservice.DTO.User.request.RegisterRequest;
+import com.projectct.authservice.DTO.User.response.LoginResponse;
+import com.projectct.authservice.DTO.User.response.UserResponse;
 
 public interface UserService {
     void register(RegisterRequest request);
-    UserResponse login(LoginRequest request);
+    LoginResponse login(LoginRequest request);
     UserResponse getUserInfo(String username);
 }

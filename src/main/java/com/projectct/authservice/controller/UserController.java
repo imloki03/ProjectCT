@@ -1,7 +1,8 @@
 package com.projectct.authservice.controller;
 
 import com.projectct.authservice.DTO.RespondData;
-import com.projectct.authservice.DTO.User.RegisterRequest;
+import com.projectct.authservice.DTO.User.request.LoginRequest;
+import com.projectct.authservice.DTO.User.request.RegisterRequest;
 import com.projectct.authservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,17 @@ public class UserController {
                 .status(HttpStatus.OK.value())
                 .data(userResponse)
                 .desc("Get user information successfully!")
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
+    @PostMapping("login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        var loginResponse = userService.login(request);
+        var respondData = RespondData.builder()
+                .status(HttpStatus.OK.value())
+                .data(loginResponse)
+                .desc("Login successfully!")
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
