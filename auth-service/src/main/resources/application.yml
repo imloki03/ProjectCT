@@ -1,7 +1,7 @@
 server:
   port: 8080
-  servlet:
-    context-path: /auth
+#  servlet:
+#    context-path: /auth
 
 spring:
   application:
@@ -21,3 +21,12 @@ jwt:
   secret_key: ${JWT_SECRET_KEY}
   refreshable_time: ${JWT_RT_EXPIRED}
   valid_time: ${JWT_AT_EXPIRED}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL}
+    register-with-eureka: true # Other service can discover
+    fetch-registry: true # Can discover other service
+  instance:
+    prefer-ip-address: true
