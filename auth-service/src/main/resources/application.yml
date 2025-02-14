@@ -1,0 +1,23 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /auth
+
+spring:
+  application:
+    name: auth-service
+
+  # Data JPA settings
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL}
+
+# JWT config
+jwt:
+  secret_key: ${JWT_SECRET_KEY}
+  refreshable_time: ${JWT_RT_EXPIRED}
+  valid_time: ${JWT_AT_EXPIRED}
