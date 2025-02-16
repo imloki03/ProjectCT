@@ -5,17 +5,15 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import com.projectct.authservice.DTO.TokenResponse;
+import com.projectct.authservice.DTO.Authentication.AuthenticationResponse;
 import com.projectct.authservice.exception.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
@@ -106,7 +104,7 @@ public class JwtUtil {
         }
     }
 
-    public TokenResponse refreshToken(String oldToken) {
+    public AuthenticationResponse refreshToken(String oldToken) {
         try {
             JWSVerifier verifier = new MACVerifier(SECRET_KEY.getBytes());
             SignedJWT signedJWT = SignedJWT.parse(oldToken);
@@ -114,8 +112,8 @@ public class JwtUtil {
 
             if (isValidToken(refreshToken)) {
                 String username = getUsernameFromToken(refreshToken);
-                return TokenResponse.builder()
-                        .accessToken(generateAccessToken(username))
+                return AuthenticationResponse.builder()
+                        .token(generateAccessToken(username))
                         .build();
             } else
                 throw new AppException(HttpStatus.UNAUTHORIZED, "Refresh token failed");
