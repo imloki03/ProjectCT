@@ -16,6 +16,10 @@ spring:
     hibernate:
       ddl-auto: ${JPA_DDL}
 
+logging:
+  level:
+    org.springframework.security: DEBUG
+
 # JWT config
 jwt:
   secret_key: ${JWT_SECRET_KEY}

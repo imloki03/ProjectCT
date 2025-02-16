@@ -32,9 +32,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST,
                                 "/users/login",
-                                "/users").permitAll()
-                        .requestMatchers(HttpMethod.GET,
-                                "/users/**").permitAll()
+                                "/users",
+                                "jwt/verify").permitAll()
                         .anyRequest().authenticated()
                 );
 

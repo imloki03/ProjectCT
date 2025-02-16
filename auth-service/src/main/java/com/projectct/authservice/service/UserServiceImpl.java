@@ -1,6 +1,6 @@
 package com.projectct.authservice.service;
 
-import com.projectct.authservice.DTO.TokenResponse;
+import com.projectct.authservice.DTO.Authentication.AuthenticationResponse;
 import com.projectct.authservice.DTO.User.request.LoginRequest;
 import com.projectct.authservice.DTO.User.request.RegisterRequest;
 import com.projectct.authservice.DTO.User.response.LoginResponse;
@@ -47,8 +47,8 @@ public class UserServiceImpl implements UserService{
 
         return LoginResponse.builder()
                 .userData(userMapper.toUserResponse(user))
-                .token(TokenResponse.builder()
-                        .accessToken(jwtUtil.generateAccessToken(request.getUsername()))
+                .token(AuthenticationResponse.builder()
+                        .token(jwtUtil.generateAccessToken(request.getUsername()))
                         .build())
                 .build();
     }
