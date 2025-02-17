@@ -19,7 +19,6 @@ public class Project {
     private Long ownerId;
     private String name;
     private String description;
-    private String urlName;
     private String avatarURL;
     private LocalDateTime createdDate;
 }
