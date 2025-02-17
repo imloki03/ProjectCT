@@ -6,6 +6,8 @@ import com.projectct.projectservice.repository.httpclient.AuthClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Slf4j
 @Service
@@ -15,8 +17,12 @@ public class ProjectServiceImpl implements ProjectService{
 
     @Override
     public ProjectResponse createNewProject(ProjectRequest request) {
-        var user = authClient.getUserInfo("loki");
-        log.error(user.getName());
+        ServletRequestAttributes servletRequestAttributes =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        var authHeader = servletRequestAttributes.getRequest().getHeader("Authorization");
+        log.error(authHeader);
+        var user = authClient.getUserInfo(authHeader, "loki");
+        log.error(user.getData().getName());
         return null;
     }
 }
