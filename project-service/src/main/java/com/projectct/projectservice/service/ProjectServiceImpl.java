@@ -17,11 +17,7 @@ public class ProjectServiceImpl implements ProjectService{
 
     @Override
     public ProjectResponse createNewProject(ProjectRequest request) {
-        ServletRequestAttributes servletRequestAttributes =
-                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        var authHeader = servletRequestAttributes.getRequest().getHeader("Authorization");
-        log.error(authHeader);
-        var user = authClient.getUserInfo(authHeader, "loki");
+        var user = authClient.getUserInfo("loki");
         log.error(user.getData().getName());
         return null;
     }
