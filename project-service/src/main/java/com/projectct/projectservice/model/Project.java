@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -21,4 +22,14 @@ public class Project {
     private String description;
     private String avatarURL;
     private LocalDateTime createdDate;
+
+    @OneToOne(mappedBy = "project", cascade = CascadeType.ALL)
+    private Backlog backlog;
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    private List<Phase> phaseList;
+
+    private Long chatboxId;
+    private Long notificationQueueId;
+    private Long storageId;
 }

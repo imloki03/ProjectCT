@@ -25,4 +25,15 @@ public class User {
     private String password;
     private String gender;
     private String avatarURL;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_tags",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tagList;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private UserStatus status;
 }
