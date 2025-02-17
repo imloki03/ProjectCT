@@ -1,0 +1,25 @@
+server:
+  port: 8084
+
+
+spring:
+  application:
+    name: notification-service
+
+  # Data JPA settings
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL}
+    register-with-eureka: true # Other service can discover
+    fetch-registry: true # Can discover other service
+  instance:
+    prefer-ip-address: true
