@@ -3,7 +3,9 @@ package com.projectct.authservice.controller;
 import com.projectct.authservice.DTO.RespondData;
 import com.projectct.authservice.DTO.User.request.LoginRequest;
 import com.projectct.authservice.DTO.User.request.RegisterRequest;
+import com.projectct.authservice.constant.MessageKey;
 import com.projectct.authservice.service.UserService;
+import com.projectct.authservice.util.MessageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,7 +24,7 @@ public class UserController {
         userService.register(request);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
-                .desc("Register successfully!")
+                .desc(MessageUtil.getMessage(MessageKey.USER_REGISTER_SUCCESS))
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
@@ -33,7 +35,7 @@ public class UserController {
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .data(userResponse)
-                .desc("Get user information successfully!")
+                .desc(MessageUtil.getMessage(MessageKey.USER_INFO_SUCCESS))
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
@@ -44,7 +46,7 @@ public class UserController {
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .data(loginResponse)
-                .desc("Login successfully!")
+                .desc(MessageUtil.getMessage(MessageKey.USER_LOGIN_SUCCESS))
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
