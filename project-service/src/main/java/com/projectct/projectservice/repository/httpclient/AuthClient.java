@@ -11,6 +11,5 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @FeignClient(name = "auth-service")
 public interface AuthClient {
     @GetMapping(value = "/users/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
-    RespondData<UserResponse> getUserInfo(@RequestHeader("Authorization") String token,
-                            @PathVariable String username);
+    RespondData<UserResponse> getUserInfo(@PathVariable String username);
 }
