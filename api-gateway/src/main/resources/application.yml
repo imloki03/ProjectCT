@@ -21,6 +21,34 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: collab-service
+          uri: lb://collab-service
+          predicates:
+            - Path=/collab/**
+          filters:
+            - StripPrefix=1
+
+        - id: message-service
+          uri: lb://message-service
+          predicates:
+            - Path=/message/**
+          filters:
+            - StripPrefix=1
+
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/notification/**
+          filters:
+            - StripPrefix=1
+
+        - id: storage-service
+          uri: lb://storage-service
+          predicates:
+            - Path=/storage/**
+          filters:
+            - StripPrefix=1
+
 eureka:
   client:
     register-with-eureka: true
