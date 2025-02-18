@@ -18,4 +18,6 @@ public class NotificationQueue {
 
     @OneToMany(mappedBy = "notificationQueue", cascade = CascadeType.REMOVE)
     private List<Notification> notificationList;
+
+    private Long projectId;
 }
