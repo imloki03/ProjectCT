@@ -2,6 +2,7 @@ package com.projectct.projectservice.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +22,9 @@ public class Project {
     private String name;
     private String description;
     private String avatarURL;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdDate;
 
     @OneToOne(mappedBy = "project", cascade = CascadeType.ALL)
