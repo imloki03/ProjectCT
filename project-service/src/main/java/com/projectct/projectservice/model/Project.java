@@ -32,4 +32,9 @@ public class Project {
     private Long chatboxId;
     private Long notificationQueueId;
     private Long storageId;
+
+    @ElementCollection
+    @CollectionTable(name = "project_collab", joinColumns = @JoinColumn(name = "project_id"))
+    @Column(name = "collab_id")
+    private List<Long> collaboratorIdList;
 }

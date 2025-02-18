@@ -18,4 +18,6 @@ public class Chatbox {
 
     @OneToMany(mappedBy = "chatbox", cascade = CascadeType.REMOVE)
     private List<Message> messageList;
+
+    private Long projectId;
 }

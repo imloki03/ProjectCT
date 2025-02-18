@@ -18,4 +18,6 @@ public class Storage {
 
     @OneToMany(mappedBy = "storage", cascade = CascadeType.REMOVE)
     private List<Media> mediaList;
+
+    private Long projectId;
 }
