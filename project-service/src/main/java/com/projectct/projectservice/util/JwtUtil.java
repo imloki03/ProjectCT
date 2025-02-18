@@ -28,4 +28,12 @@ public class JwtUtil {
     public String getUsernameFromToken(String token) {
         return getClaimsSet(token).getSubject();
     }
+
+    public Long getUserIdFromToken(String token) {
+        try {
+            return getClaimsSet(token).getLongClaim("id");
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

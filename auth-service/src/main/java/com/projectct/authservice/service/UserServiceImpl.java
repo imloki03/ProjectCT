@@ -49,6 +49,7 @@ public class UserServiceImpl implements UserService{
                 .userData(userMapper.toUserResponse(user))
                 .token(AuthenticationResponse.builder()
                         .token(jwtUtil.generateAccessToken(request.getUsername()))
+                        .authenticated(true)
                         .build())
                 .build();
     }

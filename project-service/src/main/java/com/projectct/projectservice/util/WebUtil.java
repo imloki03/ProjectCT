@@ -25,4 +25,14 @@ public class WebUtil {
         }
         return null;
     }
+
+    public Long getCurrentIdUser() {
+        HttpServletRequest request = getCurrentRequest();
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7);
+            return jwtUtil.getUserIdFromToken(token);
+        }
+        return null;
+    }
 }

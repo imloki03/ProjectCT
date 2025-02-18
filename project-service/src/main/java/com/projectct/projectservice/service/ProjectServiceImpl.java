@@ -21,6 +21,7 @@ public class ProjectServiceImpl implements ProjectService{
         var user = authClient.getUserInfo("loki");
         log.error(user.getData().getName());
         log.error(webUtil.getCurrentUsername());
+        log.error(webUtil.getCurrentIdUser().toString());
         return null;
     }
 }
