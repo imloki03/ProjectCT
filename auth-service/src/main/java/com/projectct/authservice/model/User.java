@@ -51,4 +51,6 @@ public class User {
     @CollectionTable(name = "user_collab", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "collab_id")
     private List<Long> collabWithIdList;
+
+    private Long notificationQueueId;
 }

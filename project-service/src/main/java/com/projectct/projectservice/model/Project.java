@@ -30,7 +30,6 @@ public class Project {
     private List<Phase> phaseList;
 
     private Long chatboxId;
-    private Long notificationQueueId;
     private Long storageId;
 
     @ElementCollection
