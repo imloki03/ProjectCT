@@ -16,6 +16,10 @@ spring:
     hibernate:
       ddl-auto: ${JPA_DDL}
 
+# JWT config
+jwt:
+  secret_key: ${JWT_SECRET_KEY}
+
 eureka:
   client:
     service-url:
