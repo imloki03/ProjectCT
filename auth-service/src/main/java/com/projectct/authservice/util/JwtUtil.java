@@ -7,6 +7,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.projectct.authservice.DTO.Authentication.AuthenticationResponse;
 import com.projectct.authservice.exception.AppException;
+import com.projectct.authservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,11 @@ public class JwtUtil {
     private long refreshableTime;
     @Value("${jwt.valid_time}")
     private long validTime;
+
+    final UserRepository userRepository;
+
     public String generateAccessToken(String username) {
+        var user = userRepository.findByUsername(username);
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS512)
                 .type(JOSEObjectType.JWT)
                 .build();
@@ -36,6 +41,7 @@ public class JwtUtil {
                 .expirationTime(new Date(
                         Instant.now().plus(validTime, ChronoUnit.HOURS).toEpochMilli()
                 ))
+                .claim("id", user.getId())
                 .claim("rft", generateRefreshToken(username))
                 .build();
 
