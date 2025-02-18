@@ -6,7 +6,8 @@ import lombok.experimental.FieldDefaults;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProjectRequest {
+public class UpdateProjectRequest {
     String projectName;
     String projectDescription;
+    String avatarURL;
 }
