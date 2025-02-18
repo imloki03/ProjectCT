@@ -31,7 +31,7 @@ public class JwtUtil {
     final UserRepository userRepository;
 
     public String generateAccessToken(String username) {
-        var user = userRepository.findByUsername(username);
+        var user = userRepository.findByUsernameOrEmail(username, username);
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS512)
                 .type(JOSEObjectType.JWT)
                 .build();
@@ -124,6 +124,14 @@ public class JwtUtil {
             } else
                 throw new AppException(HttpStatus.UNAUTHORIZED, "Refresh token failed");
         } catch (JOSEException | ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Long getUserIdFromToken(String token) {
+        try {
+            return getClaimsSet(token).getLongClaim("id");
+        } catch (ParseException e) {
             throw new RuntimeException(e);
         }
     }
