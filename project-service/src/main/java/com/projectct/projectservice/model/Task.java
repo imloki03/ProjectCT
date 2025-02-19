@@ -50,6 +50,11 @@ public class Task {
     @Column(name = "media_id")
     private List<Long> mediaIdList;
 
+    @ElementCollection
+    @CollectionTable(name = "task_proof", joinColumns = @JoinColumn(name = "task_id"))
+    @Column(name = "proof_id")
+    private List<Long> proofList;
+
     @ManyToOne
     private Backlog backlog;
 
@@ -62,5 +67,11 @@ public class Task {
             subtaskId.add(task.getId());
         }
         return subtaskId;
+    }
+
+    public void addSubTask(Task subTask) {
+        if (this.subTask == null)
+            this.subTask = new ArrayList<>();
+        this.subTask.add(subTask);
     }
 }
