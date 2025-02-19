@@ -10,7 +10,6 @@ public interface UserService {
     UserResponse getUserInfo(String username);
     void changePassword(ChangePasswordRequest request);
     void editProfile(EditProfileRequest request);
-    void editProfileAvatar(EditUserAvatarRequest request);
     void activateUser();
     void introducUser();
 }

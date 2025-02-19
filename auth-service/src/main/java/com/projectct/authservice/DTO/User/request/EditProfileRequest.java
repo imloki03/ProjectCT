@@ -12,4 +12,5 @@ public class EditProfileRequest {
      String name;
      String gender;
      List<Long> tagList;
+     String avatarURL;
 }
