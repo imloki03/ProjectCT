@@ -72,14 +72,9 @@ public class ProjectServiceImpl implements ProjectService{
         Long ownerId = webUtil.getCurrentIdUser();
         if (project == null)
             throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.PROJECT_NOT_FOUND));
-        if (projectRepository.existsByOwnerIdAndNameAndIdNot(ownerId, request.getProjectName(), projectId))
+        if (projectRepository.existsByOwnerIdAndNameAndIdNot(ownerId, request.getName(), projectId))
             throw new AppException(HttpStatus.CONFLICT, MessageUtil.getMessage(MessageKey.PROJECT_CREATE_DUPLICATE));
-        if (request.getProjectName() != null)
-            project.setName(request.getProjectName());
-        if (request.getProjectDescription() != null)
-            project.setDescription(request.getProjectDescription());
-        if (request.getAvatarURL() != null)
-            project.setAvatarURL(request.getAvatarURL());
+        projectMapper.updateProject(request, project);
         projectRepository.save(project);
         return projectMapper.toProjectResponse(project);
     }
