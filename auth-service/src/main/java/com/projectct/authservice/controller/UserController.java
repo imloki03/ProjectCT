@@ -2,6 +2,7 @@ package com.projectct.authservice.controller;
 
 import com.projectct.authservice.DTO.RespondData;
 import com.projectct.authservice.DTO.User.request.*;
+import com.projectct.authservice.DTO.User.response.UserResponse;
 import com.projectct.authservice.constant.MessageKey;
 import com.projectct.authservice.service.UserService;
 import com.projectct.authservice.util.MessageUtil;
@@ -62,30 +63,20 @@ public class UserController {
 
     @PutMapping
     public ResponseEntity<?> editProfile( @RequestBody EditProfileRequest request) {
-        userService.editProfile(request);
+        UserResponse res = userService.editProfile(request);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .desc(MessageUtil.getMessage(MessageKey.EDIT_PROFILE_SUCCESS))
+                .data(res)
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
-    @PatchMapping("activate")
-    public ResponseEntity<?> activateUser() {
-        userService.activateUser();
+    @PatchMapping("status")
+    public ResponseEntity<?> updateUserStatus(@RequestBody UpdateStatusRequest request) {
+        userService.updateUserStatus(request);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
-                .desc(MessageUtil.getMessage(MessageKey.USER_ACTIVATE_SUCCESS))
-                .build();
-        return new ResponseEntity<>(respondData, HttpStatus.OK);
-    }
-
-    @PatchMapping("introduce")
-    public ResponseEntity<?> introduceUser( ) {
-        userService.introducUser();
-        var respondData = RespondData.builder()
-                .status(HttpStatus.OK.value())
-                .desc(MessageUtil.getMessage(MessageKey.REQUEST_SUCCESS))
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }

@@ -1,9 +1,12 @@
 package com.projectct.authservice.DTO.User.response;
 
+import com.projectct.authservice.DTO.Tag.response.TagResponse;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @Getter
 @Builder
@@ -14,4 +17,5 @@ public class UserResponse {
     String email;
     String gender;
     String avatarURL;
+    List<TagResponse> tagList;
 }
