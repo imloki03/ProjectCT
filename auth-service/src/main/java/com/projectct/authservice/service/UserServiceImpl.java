@@ -21,8 +21,6 @@ import org.springframework.stereotype.Service;
 import com.projectct.authservice.constant.MessageKey;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -93,44 +91,42 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void editProfile(EditProfileRequest request) {
+    public UserResponse editProfile(EditProfileRequest request) {
         String username = webUtil.getCurrentUsername();
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
         }
 
-        Optional.ofNullable(request.getName()).ifPresent(user::setName);
-        Optional.ofNullable(request.getGender()).ifPresent(user::setGender);
-        Optional.ofNullable(request.getAvatarURL()).ifPresent(user::setAvatarURL);
+        userMapper.toUpdateUser(request, user);
 
         if (request.getTagList() != null && !request.getTagList().isEmpty()) {
             user.setTagList(tagRepository.findAllById(request.getTagList()));
         }
         userRepository.save(user);
+
+
+        return userMapper.toUserResponse(user);
     }
 
     @Override
-    public void activateUser() {
+    public void updateUserStatus(UpdateStatusRequest request) {
         String username = webUtil.getCurrentUsername();
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
         }
 
-        user.getStatus().setActivated(true);
-        userRepository.save(user);
-    }
+        if (!user.getStatus().isActivated())
+            user.setStatus(UserStatus.builder().
+                        isActivated(request.isActive()).
+                        build());
 
-    @Override
-    public void introducUser() {
-        String username = webUtil.getCurrentUsername();
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
-        }
+        if (user.getStatus().isNew())
+            user.setStatus(UserStatus.builder().
+                        isNew(request.isNew())
+                        .build());
 
-        user.getStatus().setNew(false);
         userRepository.save(user);
     }
 }

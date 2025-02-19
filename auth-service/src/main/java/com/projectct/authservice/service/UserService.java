@@ -9,7 +9,6 @@ public interface UserService {
     LoginResponse login(LoginRequest request);
     UserResponse getUserInfo(String username);
     void changePassword(ChangePasswordRequest request);
-    void editProfile(EditProfileRequest request);
-    void activateUser();
-    void introducUser();
+    UserResponse editProfile(EditProfileRequest request);
+    void updateUserStatus(UpdateStatusRequest request);
 }
