@@ -1,6 +1,7 @@
 package com.projectct.projectservice.exception;
 
 import com.projectct.projectservice.DTO.RespondData;
+import com.projectct.projectservice.util.MessageUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,7 +21,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleAppException(AppException e) {
         var error = RespondData.builder()
                 .status(e.getStatus().value())
-                .desc(e.getMessage())
+                .desc(MessageUtil.getMessage(e.getMessage()))
                 .build();
         return new ResponseEntity<>(error, e.getStatus());
     }
