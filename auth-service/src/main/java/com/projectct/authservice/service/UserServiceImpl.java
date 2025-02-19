@@ -19,6 +19,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.projectct.authservice.constant.MessageKey;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,7 +34,9 @@ public class UserServiceImpl implements UserService{
     final WebUtil webUtil;
     final TagRepository tagRepository;
     final UserStatusRepository userStatusRepository;
+
     @Override
+    @Transactional
     public void register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail()))
             throw new AppException(HttpStatus.CONFLICT, MessageKey.EMAIL_ALREADY_EXISTS);
@@ -62,7 +67,7 @@ public class UserServiceImpl implements UserService{
         return LoginResponse.builder()
                 .userData(userMapper.toUserResponse(user))
                 .token(AuthenticationResponse.builder()
-                        .token(jwtUtil.generateAccessToken(request.getUsername()))
+                        .token(jwtUtil.generateAccessToken(user.getUsername()))
                         .authenticated(true)
                         .build())
                 .build();
@@ -94,23 +99,15 @@ public class UserServiceImpl implements UserService{
         if (user == null) {
             throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
         }
-        userRepository.save(user.toBuilder()
-                .name(request.getName())
-                .gender(request.getGender())
-                .tagList(tagRepository.findAllById(request.getTagList()))
-                .build());
-    }
 
-    @Override
-    public void editProfileAvatar(EditUserAvatarRequest request) {
-        String username = webUtil.getCurrentUsername();
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
+        Optional.ofNullable(request.getName()).ifPresent(user::setName);
+        Optional.ofNullable(request.getGender()).ifPresent(user::setGender);
+        Optional.ofNullable(request.getAvatarURL()).ifPresent(user::setAvatarURL);
+
+        if (request.getTagList() != null && !request.getTagList().isEmpty()) {
+            user.setTagList(tagRepository.findAllById(request.getTagList()));
         }
-        userRepository.save(user.toBuilder()
-                .avatarURL(request.getAvatarURL())
-                .build());
+        userRepository.save(user);
     }
 
     @Override

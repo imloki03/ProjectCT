@@ -70,16 +70,6 @@ public class UserController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
-    @PutMapping("avatar")
-    public ResponseEntity<?> editProfileAvatar( @RequestBody EditUserAvatarRequest request) {
-        userService.editProfileAvatar(request);
-        var respondData = RespondData.builder()
-                .status(HttpStatus.OK.value())
-                .desc(MessageUtil.getMessage(MessageKey.EDIT_PROFILE_SUCCESS))
-                .build();
-        return new ResponseEntity<>(respondData, HttpStatus.OK);
-    }
-
     @PatchMapping("activate")
     public ResponseEntity<?> activateUser() {
         userService.activateUser();

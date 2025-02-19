@@ -31,7 +31,7 @@ public class JwtUtil {
     final UserRepository userRepository;
 
     public String generateAccessToken(String username) {
-        var user = userRepository.findByUsernameOrEmail(username, username);
+        var user = userRepository.findByUsername(username);
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS512)
                 .type(JOSEObjectType.JWT)
                 .build();
