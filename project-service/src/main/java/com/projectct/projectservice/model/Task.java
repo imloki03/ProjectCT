@@ -61,14 +61,6 @@ public class Task {
     @ManyToOne
     private Phase phase;
 
-    public List<Long> getSubtaskIdList(){
-        List<Long> subtaskId = new ArrayList<>();
-        for (Task task : subTask) {
-            subtaskId.add(task.getId());
-        }
-        return subtaskId;
-    }
-
     public void addSubTask(Task subTask) {
         if (this.subTask == null)
             this.subTask = new ArrayList<>();

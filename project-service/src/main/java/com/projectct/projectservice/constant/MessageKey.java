@@ -12,4 +12,11 @@ public class MessageKey {
     public static final String PHASE_UPDATE_SUCCESS = "phase.update.success";
     public static final String PHASE_DELETE_SUCCESS = "phase.delete.success";
     public static final String PHASE_NOT_FOUND = "phase.not.found";
+    public static final String TASK_MOVE_FAILED = "task.move.failed";
+    public static final String TASK_UPDATE_SUCCESS = "task.update.success";
+    public static final String TASK_UPDATE_STATUS_SUCCESS = "task.update.status.success";
+    public static final String TASK_ASSIGN_SUCCESS = "task.assign.success";
+    public static final String TASK_MOVE_PHASE_SUCCESS = "task.move.phase.success";
+    public static final String TASK_MOVE_BACKLOG_SUCCESS = "task.move.backlog.success";
+    public static final String TASK_DELETE_SUCCESS = "task.delete.success";
 }

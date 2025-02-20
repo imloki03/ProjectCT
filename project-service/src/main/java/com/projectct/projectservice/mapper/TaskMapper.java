@@ -1,10 +1,10 @@
 package com.projectct.projectservice.mapper;
 
 import com.projectct.projectservice.DTO.Task.request.TaskRequest;
+import com.projectct.projectservice.DTO.Task.request.UpdateTaskRequest;
 import com.projectct.projectservice.DTO.Task.response.TaskResponse;
 import com.projectct.projectservice.model.Task;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -16,4 +16,6 @@ public interface TaskMapper {
     TaskResponse toTaskResponse(Task task);
     Task toTask(TaskRequest request);
     List<TaskResponse> toTaskResponseList(List<Task> tasks);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateTask(UpdateTaskRequest request, @MappingTarget Task task);
 }
