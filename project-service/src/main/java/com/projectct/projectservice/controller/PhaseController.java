@@ -45,7 +45,7 @@ public class PhaseController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
-    @GetMapping("/pid/{projectId}")
+    @GetMapping("/p/{projectId}")
     public ResponseEntity<?> getAllPhase(@PathVariable Long projectId){
         List<PhaseResponse> phaseResponses = phaseService.getAllPhase(projectId);
         var respondData = RespondData
