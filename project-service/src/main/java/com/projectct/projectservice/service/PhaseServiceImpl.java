@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,9 +60,6 @@ public class PhaseServiceImpl implements PhaseService {
             throw new AppException(HttpStatus.NOT_FOUND, MessageKey.PROJECT_NOT_FOUND);
         }
         List<Phase> phaseList = phaseRepository.findByProject(project);
-        if (phaseList.isEmpty()) {
-            throw new AppException(HttpStatus.NOT_FOUND, MessageKey.PHASE_NOT_FOUND);
-        }
         return phaseMapper.toPhaseResponseList(phaseList);
     }
 
@@ -75,6 +73,7 @@ public class PhaseServiceImpl implements PhaseService {
         return phaseMapper.toPhaseResponse(phase);
     }
 
+    @Transactional
     @Override
     public void deletePhase(Long phaseId) {
         Phase phase = phaseRepository.findById(phaseId).orElse(null);
