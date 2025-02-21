@@ -129,4 +129,12 @@ public class UserServiceImpl implements UserService{
 
         userRepository.save(user);
     }
+
+    @Override
+    public UserResponse getUserInfoById(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null)
+            throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
+        return userMapper.toUserResponse(user);
+    }
 }
