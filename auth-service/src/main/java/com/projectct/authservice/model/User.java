@@ -43,11 +43,6 @@ public class User {
     private List<Long> projectIdList;
 
     @ElementCollection
-    @CollectionTable(name = "user_task", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "task_id")
-    private List<Long> taskIdList;
-
-    @ElementCollection
     @CollectionTable(name = "user_collab", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "collab_id")
     private List<Long> collabWithIdList;

@@ -29,9 +29,20 @@ public class UserController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
-    @GetMapping("{username}")
+    @GetMapping({"{username}"})
     public ResponseEntity<?> getUserInfo(@PathVariable String username) {
         var userResponse = userService.getUserInfo(username);
+        var respondData = RespondData.builder()
+                .status(HttpStatus.OK.value())
+                .data(userResponse)
+                .desc(MessageUtil.getMessage(MessageKey.USER_INFO_SUCCESS))
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
+    @GetMapping({"u/{userId}"})
+    public ResponseEntity<?> getUserInfoById(@PathVariable Long userId) {
+        var userResponse = userService.getUserInfoById(userId);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .data(userResponse)

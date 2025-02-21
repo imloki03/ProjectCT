@@ -20,7 +20,12 @@ public class Role {
     private Long projectId;
 
 
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
+    @ManyToMany
+    @JoinTable(
+            name = "role_function",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "function_id")
+    )
     private List<AppFunction> functionList;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)

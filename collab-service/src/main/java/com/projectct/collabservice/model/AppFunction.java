@@ -23,7 +23,6 @@ public class AppFunction {
     @Enumerated(EnumType.STRING)
     private FunctionType functionType;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    private Role role;
+    @ManyToMany(mappedBy = "functionList")
+    private List<Role> roleList;
 }
