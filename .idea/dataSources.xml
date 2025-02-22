@@ -22,5 +22,12 @@
       <jdbc-url>jdbc:mysql://localhost:3306/projectct_collab</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="projectct_storage@localhost" uuid="5b3ad64b-730d-422d-ad34-e2e55063b5e0">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://localhost:3306/projectct_storage</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

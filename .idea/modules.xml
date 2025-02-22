@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/api-gateway.main.iml" filepath="$PROJECT_DIR$/.idea/modules/api-gateway.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/auth-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/auth-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/project-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/project-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/storage-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/storage-service.main.iml" />
     </modules>
   </component>
 </project>
