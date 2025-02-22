@@ -4,6 +4,7 @@ package com.projectct.storageservice.model;
 import com.projectct.storageservice.enums.MediaType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -22,6 +23,9 @@ public class Media {
     private String description;
     private String filename;
     private String size;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime uploadTime;
 
     @Enumerated(EnumType.STRING)
@@ -29,7 +33,7 @@ public class Media {
 
     private String link;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "previous_version_id")
     private Media previousVersion;
 

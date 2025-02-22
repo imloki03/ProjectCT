@@ -14,6 +14,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: ${JPA_DDL}
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+
+# JWT config
+jwt:
+  secret_key: ${JWT_SECRET_KEY}
 
 eureka:
   client:
@@ -23,3 +30,9 @@ eureka:
     fetch-registry: true # Can discover other service
   instance:
     prefer-ip-address: true
+
+# Cloudinary config
+cloudinary:
+  cloud-name: ${CLOUDINARY_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
