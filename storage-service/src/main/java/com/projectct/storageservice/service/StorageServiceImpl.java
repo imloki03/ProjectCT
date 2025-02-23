@@ -41,14 +41,15 @@ public class StorageServiceImpl implements StorageService{
 
     @Transactional
     @Override
-    public MediaResponse addMedia(Long projectId, MediaRequest request) {
+    public MediaResponse addMedia(Long projectId, MediaRequest request, boolean stored) {
         Media media = mediaMapper.toMedia(request);
         media.setType(convertFilenameToMediaType(request.getFilename()));
         Storage storage = storageRepository.findByProjectId(projectId);
         if (storage == null)
             throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.STORAGE_NOT_FOUND));
         storage.addMedia(media);
-        media.setStorage(storage);
+        if (stored)
+            media.setStorage(storage);
         mediaRepository.save(media);
         storageRepository.save(storage);
         return mediaMapper.toMediaResponse(media);

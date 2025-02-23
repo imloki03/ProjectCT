@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface StorageService {
     StorageResponse createStorage(Long projectId);
-    MediaResponse addMedia(Long projectId, MediaRequest request);
+    MediaResponse addMedia(Long projectId, MediaRequest request, boolean stored);
     MediaResponse getMediaInfo(Long mediaId);
     List<MediaResponse> getStorageMedia(Long projectId);
     MediaResponse updateMediaInfo(Long mediaId, MediaRequest request);

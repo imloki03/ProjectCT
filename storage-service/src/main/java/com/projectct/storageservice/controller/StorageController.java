@@ -30,8 +30,10 @@ public class StorageController {
     }
 
     @PostMapping("media/{projectId}")
-    public ResponseEntity<?> addMedia(@PathVariable Long projectId, @RequestBody MediaRequest request) {
-        var media = storageService.addMedia(projectId, request);
+    public ResponseEntity<?> addMedia(@PathVariable Long projectId,
+                                      @RequestBody MediaRequest request,
+                                      @RequestParam(required = false, defaultValue = "false") boolean stored) {
+        var media = storageService.addMedia(projectId, request, stored);
         var respondData = RespondData
                 .builder()
                 .status(HttpStatus.OK.value())
