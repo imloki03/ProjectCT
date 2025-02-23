@@ -5,6 +5,7 @@ import com.projectct.storageservice.service.CloudinaryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,8 +18,9 @@ public class CloudinaryController {
     final CloudinaryService cloudinaryService;
 
     @PostMapping
-    public ResponseEntity<?> uploadFile(@RequestPart MultipartFile file) {
-        var cloudinary = cloudinaryService.uploadFile(file);
+    public ResponseEntity<?> uploadFile(@RequestPart("file") MultipartFile file,
+                                        @RequestParam(defaultValue = "false") boolean stored) {
+        var cloudinary = cloudinaryService.uploadFile(file, stored);
         var respondData = RespondData
                 .builder()
                 .status(HttpStatus.OK.value())
