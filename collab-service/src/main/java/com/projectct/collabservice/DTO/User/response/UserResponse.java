@@ -1,4 +1,4 @@
-package com.projectct.collabservice.DTO.response;
+package com.projectct.collabservice.DTO.User.response;
 
 import lombok.AccessLevel;
 import lombok.Builder;

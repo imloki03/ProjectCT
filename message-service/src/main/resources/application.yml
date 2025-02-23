@@ -13,6 +13,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: ${JPA_DDL}
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
 
 eureka:
   client:

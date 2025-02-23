@@ -3,7 +3,6 @@ package com.projectct.collabservice.service;
 import com.projectct.collabservice.DTO.Function.request.FunctionRequest;
 import com.projectct.collabservice.DTO.Function.request.FunctionUpdateRequest;
 import com.projectct.collabservice.DTO.Function.response.FunctionResponse;
-import com.projectct.collabservice.DTO.response.UserResponse;
 import com.projectct.collabservice.constant.MessageKey;
 import com.projectct.collabservice.exception.AppException;
 import com.projectct.collabservice.mapper.FunctionMapper;
@@ -16,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
