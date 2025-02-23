@@ -3,7 +3,7 @@ package com.projectct.collabservice.service;
 import com.projectct.collabservice.DTO.Collaborator.request.CollabRequest;
 import com.projectct.collabservice.DTO.Collaborator.request.CollabRoleUpdateRequest;
 import com.projectct.collabservice.DTO.Collaborator.response.CollabResponse;
-import com.projectct.collabservice.DTO.response.UserResponse;
+import com.projectct.collabservice.DTO.User.response.UserResponse;
 import com.projectct.collabservice.constant.MessageKey;
 
 import com.projectct.collabservice.exception.AppException;
@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

@@ -27,10 +27,10 @@ public class Message {
 
     @ElementCollection
     @CollectionTable(name = "message_reader", joinColumns = @JoinColumn(name = "message_id"))
-    @Column(name = "reader_id")
-    private List<Long> readerList;
+    @Column(name = "reader_username")
+    private List<String> readerList;
 
-    private String mediaId;
+    private Long mediaId;
 
     @ManyToOne
     @JoinColumn(name = "chatbox_id")
