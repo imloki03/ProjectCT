@@ -16,10 +16,12 @@ import com.projectct.collabservice.repository.httpclient.AuthClient;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -29,6 +31,7 @@ public class CollaboratorServiceImpl implements CollaboratorService {
     final RoleRepository roleRepository;
     final CollabMapper collabMapper;
     final AuthClient authClient;
+    final CachedUserService cachedUserService;
 
     @Override
     public void createCollab(CollabRequest collabRequest) {
@@ -44,13 +47,23 @@ public class CollaboratorServiceImpl implements CollaboratorService {
     @Override
     public List<CollabResponse> getAllCollabFromProject(Long projectId) {
         List<Collaborator> collaborators = collaboratorRepository.findByProjectId(projectId);
-        List<CollabResponse> collabResponses = collabMapper.toResponseList(collaborators);
-        for (int i = 0; i < collaborators.size(); i++) {
-            UserResponse user = authClient.getUserInfo(collaborators.get(i).getUserId()).getData();
-            collabResponses.get(i).setUser(user);
-        }
-        return collabResponses;
+        List<Long> userIds = collaborators.stream().map(Collaborator::getUserId).toList();
+
+        Map<Long, UserResponse> userMap = cachedUserService.getUserList(userIds);
+
+//        List<CollabResponse> collabResponses = collabMapper.toResponseList(collaborators);
+//        for (int i = 0; i < collaborators.size(); i++) {
+//            UserResponse user = authClient.getUserInfo(collaborators.get(i).getUserId()).getData();
+//            collabResponses.get(i).setUser(user);
+//        }
+//        return collabResponses;
+        return collaborators.stream().map(c -> {
+            CollabResponse response = collabMapper.toResponse(c);
+            response.setUser(userMap.get(c.getUserId()));
+            return response;
+        }).toList();
     }
+
 
     @Override
     public CollabResponse getCollab(Long collabId) {
@@ -59,7 +72,7 @@ public class CollaboratorServiceImpl implements CollaboratorService {
             throw new AppException(HttpStatus.NOT_FOUND, MessageKey.COLLAB_NOT_FOUND);
         }
         CollabResponse collabResponse = collabMapper.toResponse(collaborator);
-        collabResponse.setUser(authClient.getUserInfo(collaborator.getUserId()).getData());
+        collabResponse.setUser(cachedUserService.getUserInfo(collaborator.getUserId()));
         return collabResponse;
     }
 

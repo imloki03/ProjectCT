@@ -8,6 +8,7 @@ import com.projectct.authservice.exception.AppException;
 import com.projectct.authservice.mapper.UserMapper;
 import com.projectct.authservice.model.User;
 import com.projectct.authservice.model.UserStatus;
+import com.projectct.authservice.redis.UserCachePublisher;
 import com.projectct.authservice.repository.TagRepository;
 import com.projectct.authservice.repository.UserRepository;
 import com.projectct.authservice.repository.UserStatusRepository;
@@ -21,6 +22,9 @@ import org.springframework.stereotype.Service;
 import com.projectct.authservice.constant.MessageKey;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -32,6 +36,7 @@ public class UserServiceImpl implements UserService{
     final WebUtil webUtil;
     final TagRepository tagRepository;
     final UserStatusRepository userStatusRepository;
+    final UserCachePublisher userCachePublisher;
 
     @Override
     @Transactional
@@ -105,6 +110,7 @@ public class UserServiceImpl implements UserService{
         }
         userRepository.save(user);
 
+        userCachePublisher.publish(userMapper.toUserResponse(user));
 
         return userMapper.toUserResponse(user);
     }
@@ -136,5 +142,13 @@ public class UserServiceImpl implements UserService{
         if (user == null)
             throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
         return userMapper.toUserResponse(user);
+    }
+
+    @Override
+    public List<UserResponse> getUserList(List<Long> userIds) {
+        List<UserResponse> userResponses = new ArrayList<>();
+        for (Long userId : userIds)
+            userResponses.add(getUserInfoById(userId));
+        return userResponses;
     }
 }

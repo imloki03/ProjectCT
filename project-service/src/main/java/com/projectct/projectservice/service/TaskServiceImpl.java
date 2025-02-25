@@ -127,6 +127,7 @@ public class TaskServiceImpl implements TaskService{
         return task.getParentTask().getSubTask().size();
     }
 
+    @Transactional
     @Override
     public TaskResponse assignTask(Long taskId, Long collabId) {
         Task task = taskRepository.findById(taskId).orElse(null);
@@ -154,6 +155,7 @@ public class TaskServiceImpl implements TaskService{
                 assignAllSubTask(task, collabId);
     }
 
+    @Transactional
     @Override
     public void moveTaskToPhase(Long taskId, Long phaseId) {
         Phase phase = phaseRepository.findById(phaseId).orElse(null);
@@ -177,6 +179,7 @@ public class TaskServiceImpl implements TaskService{
                 moveAllSubtaskToPhase(subTask, phase);
     }
 
+    @Transactional
     @Override
     public void moveTaskToBacklog(Long taskId) {
         Task task = taskRepository.findById(taskId).orElse(null);
@@ -198,6 +201,7 @@ public class TaskServiceImpl implements TaskService{
                 moveAllSubtaskToBacklog(subTask);
     }
 
+    @Transactional
     @Override
     public void deleteTask(Long taskId) {
         taskRepository.deleteById(taskId);
