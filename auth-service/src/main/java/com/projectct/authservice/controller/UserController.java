@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("users")
@@ -88,6 +90,16 @@ public class UserController {
         userService.updateUserStatus(request);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
+    @GetMapping()
+    public ResponseEntity<?> getUserList(@RequestParam List<Long> userIds) {
+        var users = userService.getUserList(userIds);
+        var respondData = RespondData.builder()
+                .status(HttpStatus.OK.value())
+                .data(users)
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }

@@ -5,6 +5,8 @@ import com.projectct.authservice.DTO.User.response.LoginResponse;
 import com.projectct.authservice.DTO.User.response.UserResponse;
 import com.projectct.authservice.model.User;
 
+import java.util.List;
+
 public interface UserService {
     void register(RegisterRequest request);
     LoginResponse login(LoginRequest request);
@@ -14,4 +16,5 @@ public interface UserService {
     void updateUserStatus(UpdateStatusRequest request);
 
     UserResponse getUserInfoById(Long userId);
+    List<UserResponse> getUserList(List<Long> userIds);
 }
