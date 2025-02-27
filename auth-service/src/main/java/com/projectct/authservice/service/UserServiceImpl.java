@@ -4,6 +4,7 @@ import com.projectct.authservice.DTO.Authentication.AuthenticationResponse;
 import com.projectct.authservice.DTO.User.request.*;
 import com.projectct.authservice.DTO.User.response.LoginResponse;
 import com.projectct.authservice.DTO.User.response.UserResponse;
+import com.projectct.authservice.constant.KafkaTopic;
 import com.projectct.authservice.exception.AppException;
 import com.projectct.authservice.mapper.UserMapper;
 import com.projectct.authservice.model.User;
@@ -13,6 +14,7 @@ import com.projectct.authservice.repository.TagRepository;
 import com.projectct.authservice.repository.UserRepository;
 import com.projectct.authservice.repository.UserStatusRepository;
 import com.projectct.authservice.util.JwtUtil;
+import com.projectct.authservice.util.KafkaProducer;
 import com.projectct.authservice.util.WebUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,7 @@ public class UserServiceImpl implements UserService{
     final TagRepository tagRepository;
     final UserStatusRepository userStatusRepository;
     final UserCachePublisher userCachePublisher;
+    final KafkaProducer kafkaProducer;
 
     @Override
     @Transactional
@@ -57,6 +60,7 @@ public class UserServiceImpl implements UserService{
         userStatusRepository.save(newUserStatus);
         newUser.setStatus(newUserStatus);
         userRepository.save(newUser);
+        kafkaProducer.sendMessage(KafkaTopic.INIT_USER, newUser.getId());
     }
 
     @Override

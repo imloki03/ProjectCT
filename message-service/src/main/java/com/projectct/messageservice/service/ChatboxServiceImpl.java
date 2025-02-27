@@ -24,16 +24,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ChatboxServiceImpl implements ChatboxService {
-    final ChatboxRepository chatboxRepository;
-    final MessageRepository messageRepository;
-    final MessageMapper messageMapper;
-    final AuthClient authClient;
-    final StorageClient storageClient;
-
-    @Override
-    public void createChatBox(Long projectId) {
-        chatboxRepository.save(Chatbox.builder().projectId(projectId).build());
-    }
+        final ChatboxRepository chatboxRepository;
+        final MessageRepository messageRepository;
+        final MessageMapper messageMapper;
+        final AuthClient authClient;
+        final StorageClient storageClient;
 
     @Override
     public Page<MessageResponse> getMessagesByProject(Long projectId, int page, int size) {
@@ -54,6 +49,7 @@ public class ChatboxServiceImpl implements ChatboxService {
         return messages.stream().map(this::fetchFromClients).collect(Collectors.toList());
     }
 
+    //cải tiến
     private MessageResponse fetchFromClients(Message message) {
         MessageResponse response = messageMapper.toMessageResponse(message);
         response.setUser(authClient.getUserInfo(message.getSenderId()).getData());

@@ -36,16 +36,4 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
     private UserStatus status;
-
-    @ElementCollection
-    @CollectionTable(name = "user_project", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "project_id")
-    private List<Long> projectIdList;
-
-    @ElementCollection
-    @CollectionTable(name = "user_collab", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "collab_id")
-    private List<Long> collabWithIdList;
-
-    private Long notificationQueueId;
 }

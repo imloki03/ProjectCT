@@ -21,6 +21,4 @@ public class MessageResponse {
     List<String> readerList;
     Boolean isPinned;
     MediaResponse media;
-    //Returning media still missing
-    //MediaResponse media;
 }

@@ -3,6 +3,7 @@ package com.projectct.projectservice.service;
 import com.projectct.projectservice.DTO.Project.request.ProjectRequest;
 import com.projectct.projectservice.DTO.Project.request.UpdateProjectRequest;
 import com.projectct.projectservice.DTO.Project.response.ProjectResponse;
+import com.projectct.projectservice.constant.KafkaTopic;
 import com.projectct.projectservice.constant.MessageKey;
 import com.projectct.projectservice.exception.AppException;
 import com.projectct.projectservice.mapper.ProjectMapper;
@@ -10,6 +11,7 @@ import com.projectct.projectservice.model.Backlog;
 import com.projectct.projectservice.model.Project;
 import com.projectct.projectservice.repository.ProjectRepository;
 import com.projectct.projectservice.repository.httpclient.AuthClient;
+import com.projectct.projectservice.util.KafkaProducer;
 import com.projectct.projectservice.util.MessageUtil;
 import com.projectct.projectservice.util.WebUtil;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class ProjectServiceImpl implements ProjectService{
     final WebUtil webUtil;
     final ProjectRepository projectRepository;
     final ProjectMapper projectMapper;
+    final KafkaProducer kafkaProducer;
     @Transactional
     @Override
     public ProjectResponse createNewProject(ProjectRequest request) {
@@ -48,6 +51,7 @@ public class ProjectServiceImpl implements ProjectService{
                 .build();
         project.setBacklog(backlog);
         projectRepository.save(project);
+        kafkaProducer.sendMessage(KafkaTopic.INIT_PROJECT, project.getId());
         return projectMapper.toProjectResponse(project);
     }
 

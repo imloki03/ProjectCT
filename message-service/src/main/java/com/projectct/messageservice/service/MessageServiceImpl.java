@@ -21,6 +21,7 @@ public class MessageServiceImpl implements MessageService {
     final MessageRepository messageRepository;
     final MessageMapper messageMapper;
     final SimpMessagingTemplate messagingTemplate;
+
     @Override
     public void sendMessage(MessageRequest request) {
         Message message = messageMapper.toMessage(request);

@@ -14,6 +14,23 @@ spring:
   jpa:
     hibernate:
       ddl-auto: ${JPA_DDL}
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+  #Kafka settings
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+# JWT config
+jwt:
+  secret_key: ${JWT_SECRET_KEY}
 
 eureka:
   client:

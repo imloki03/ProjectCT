@@ -7,7 +7,6 @@ import com.projectct.storageservice.DTO.Storage.response.StorageResponse;
 import java.util.List;
 
 public interface StorageService {
-    StorageResponse createStorage(Long projectId);
     MediaResponse addMedia(Long projectId, MediaRequest request, boolean stored);
     MediaResponse getMediaInfo(Long mediaId);
     List<MediaResponse> getStorageMedia(Long projectId);

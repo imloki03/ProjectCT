@@ -30,15 +30,6 @@ public class StorageServiceImpl implements StorageService{
     final StorageMapper storageMapper;
     final MediaMapper mediaMapper;
 
-    @Override
-    public StorageResponse createStorage(Long projectId) {
-        Storage storage = Storage.builder()
-                .projectId(projectId)
-                .build();
-        storageRepository.save(storage);
-        return storageMapper.toStorageResponse(storage);
-    }
-
     @Transactional
     @Override
     public MediaResponse addMedia(Long projectId, MediaRequest request, boolean stored) {
