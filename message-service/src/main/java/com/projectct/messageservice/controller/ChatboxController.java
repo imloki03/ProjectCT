@@ -22,16 +22,6 @@ import java.util.List;
 public class ChatboxController {
     final ChatboxService chatboxService;
 
-    @PostMapping("p/{projectId}")
-    public ResponseEntity<?> createChatBox(@PathVariable Long projectId){
-        chatboxService.createChatBox(projectId);
-        var respondData = RespondData
-                .builder()
-                .status(HttpStatus.OK.value())
-                .build();
-        return new ResponseEntity<>(respondData, HttpStatus.OK);
-    }
-
     @GetMapping("p/{projectId}")
     public ResponseEntity<?> getMessagesByProject(
                             @PathVariable Long projectId,

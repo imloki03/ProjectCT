@@ -32,12 +32,4 @@ public class Project {
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<Phase> phaseList;
-
-    private Long chatboxId;
-    private Long storageId;
-
-    @ElementCollection
-    @CollectionTable(name = "project_collab", joinColumns = @JoinColumn(name = "project_id"))
-    @Column(name = "collab_id")
-    private List<Long> collaboratorIdList;
 }

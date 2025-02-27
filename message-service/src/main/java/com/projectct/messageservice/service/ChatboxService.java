@@ -6,8 +6,6 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface ChatboxService {
-    void createChatBox(Long projectId);
-
     Page<MessageResponse> getMessagesByProject(Long projectId, int page, int size);
 
     List<MessageResponse> getPinnedMessagesByProject(Long projectId);

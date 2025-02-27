@@ -18,17 +18,6 @@ import org.springframework.web.bind.annotation.*;
 public class StorageController {
     final StorageService storageService;
 
-    @PostMapping("{projectId}")
-    public ResponseEntity<?> createStorage(@PathVariable Long projectId) {
-        var storage = storageService.createStorage(projectId);
-        var respondData = RespondData
-                .builder()
-                .status(HttpStatus.OK.value())
-                .data(storage)
-                .build();
-        return new ResponseEntity<>(respondData, HttpStatus.OK);
-    }
-
     @PostMapping("media/{projectId}")
     public ResponseEntity<?> addMedia(@PathVariable Long projectId,
                                       @RequestBody MediaRequest request,
