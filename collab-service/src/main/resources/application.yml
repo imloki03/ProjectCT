@@ -23,6 +23,12 @@ spring:
       port: 6379
   cache:
     type: redis
+  #Kafka settings
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 eureka:
   client:

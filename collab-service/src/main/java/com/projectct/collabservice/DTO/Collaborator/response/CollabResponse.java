@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CollabResponse {
     Long id;
+    Long userId;
     UserResponse user;
     Long projectId;
     RoleResponse role;

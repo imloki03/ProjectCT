@@ -3,6 +3,7 @@ package com.projectct.collabservice.controller;
 import com.projectct.collabservice.DTO.Collaborator.request.CollabRequest;
 import com.projectct.collabservice.DTO.Collaborator.request.CollabRoleUpdateRequest;
 import com.projectct.collabservice.DTO.Collaborator.response.CollabResponse;
+import com.projectct.collabservice.DTO.Notification.request.DirectNotificationRequest;
 import com.projectct.collabservice.DTO.RespondData;
 import com.projectct.collabservice.constant.MessageKey;
 import com.projectct.collabservice.service.CollaboratorService;
@@ -73,6 +74,16 @@ public class CollaboratorController {
                 .builder()
                 .status(HttpStatus.OK.value())
                 .desc(MessageUtil.getMessage(MessageKey.COLLAB_DELETE_SUCCESS))
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
+    @PutMapping
+    public ResponseEntity<?> inviteCollaborator(@RequestBody DirectNotificationRequest request) {
+        collaboratorService.inviteCollaborator(request);
+        var respondData = RespondData
+                .builder()
+                .status(HttpStatus.OK.value())
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }

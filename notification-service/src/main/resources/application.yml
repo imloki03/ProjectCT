@@ -1,7 +1,6 @@
 server:
   port: 8084
 
-
 spring:
   application:
     name: notification-service
@@ -27,6 +26,12 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  cache:
+    type: redis
 
 # JWT config
 jwt:

@@ -19,14 +19,10 @@ import java.util.concurrent.ExecutionException;
 @RequiredArgsConstructor
 public class KafkaProducer {
     final private KafkaTemplate<String, Object> kafkaTemplate;
-    final private ObjectMapper objectMapper;
+    final ObjectMapperUtil objectMapperUtil ;
 
     public void sendMessage(String topic, Object message) {
-        try {
-            String jsonResponse = objectMapper.writeValueAsString(message);
-            kafkaTemplate.send(topic, jsonResponse);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        String jsonResponse = objectMapperUtil.toJson(message);
+        kafkaTemplate.send(topic, jsonResponse);
     }
 }
