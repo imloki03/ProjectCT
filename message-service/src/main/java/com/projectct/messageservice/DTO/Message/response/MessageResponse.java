@@ -1,7 +1,7 @@
 package com.projectct.messageservice.DTO.Message.response;
 
 import com.projectct.messageservice.DTO.Media.response.MediaResponse;
-import com.projectct.messageservice.DTO.response.UserResponse;
+import com.projectct.messageservice.DTO.User.response.UserResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

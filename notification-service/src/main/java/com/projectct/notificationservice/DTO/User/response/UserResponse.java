@@ -1,4 +1,4 @@
-package com.projectct.messageservice.DTO.response;
+package com.projectct.notificationservice.DTO.User.response;
 
 import lombok.AccessLevel;
 import lombok.Builder;

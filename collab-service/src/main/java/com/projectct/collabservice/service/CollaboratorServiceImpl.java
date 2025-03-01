@@ -3,9 +3,12 @@ package com.projectct.collabservice.service;
 import com.projectct.collabservice.DTO.Collaborator.request.CollabRequest;
 import com.projectct.collabservice.DTO.Collaborator.request.CollabRoleUpdateRequest;
 import com.projectct.collabservice.DTO.Collaborator.response.CollabResponse;
+import com.projectct.collabservice.DTO.Notification.request.DirectNotificationRequest;
 import com.projectct.collabservice.DTO.User.response.UserResponse;
+import com.projectct.collabservice.constant.KafkaTopic;
 import com.projectct.collabservice.constant.MessageKey;
 
+import com.projectct.collabservice.constant.NotificationType;
 import com.projectct.collabservice.exception.AppException;
 import com.projectct.collabservice.mapper.CollabMapper;
 import com.projectct.collabservice.model.Collaborator;
@@ -13,10 +16,10 @@ import com.projectct.collabservice.model.Role;
 import com.projectct.collabservice.repository.CollaboratorRepository;
 import com.projectct.collabservice.repository.RoleRepository;
 import com.projectct.collabservice.repository.httpclient.AuthClient;
+import com.projectct.collabservice.util.KafkaProducer;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -26,12 +29,14 @@ import java.util.Map;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CollaboratorServiceImpl implements CollaboratorService {
+public class CollaboratorServiceImpl implements CollaboratorService{
     final CollaboratorRepository collaboratorRepository;
     final RoleRepository roleRepository;
     final CollabMapper collabMapper;
     final AuthClient authClient;
     final CachedUserService cachedUserService;
+    final FCMTokenCacheService fcmTokenCacheService;
+    final KafkaProducer kafkaProducer;
 
     @Override
     public void createCollab(CollabRequest collabRequest) {
@@ -50,13 +55,6 @@ public class CollaboratorServiceImpl implements CollaboratorService {
         List<Long> userIds = collaborators.stream().map(Collaborator::getUserId).toList();
 
         Map<Long, UserResponse> userMap = cachedUserService.getUserList(userIds);
-
-//        List<CollabResponse> collabResponses = collabMapper.toResponseList(collaborators);
-//        for (int i = 0; i < collaborators.size(); i++) {
-//            UserResponse user = authClient.getUserInfo(collaborators.get(i).getUserId()).getData();
-//            collabResponses.get(i).setUser(user);
-//        }
-//        return collabResponses;
         return collaborators.stream().map(c -> {
             CollabResponse response = collabMapper.toResponse(c);
             response.setUser(userMap.get(c.getUserId()));
@@ -77,6 +75,13 @@ public class CollaboratorServiceImpl implements CollaboratorService {
     }
 
     @Override
+    public void inviteCollaborator(DirectNotificationRequest request) {
+        request.setToken(fcmTokenCacheService.getFCMToken(request.getRecipient()).replaceAll("^\"|\"$", ""));
+        request.setType(NotificationType.INVITE_NOTIFICATION);
+        kafkaProducer.sendMessage(KafkaTopic.USER_DIRECT_NOTIFICATION, request);
+    }
+
+    @Override
     public void updateCollabRole(CollabRoleUpdateRequest request, Long collabId) {
         Role role = roleRepository.findById(request.getRoleId()).orElse(null);
         if (role==null) {
@@ -92,6 +97,7 @@ public class CollaboratorServiceImpl implements CollaboratorService {
 
     @Transactional
     @Override
+    //xóa task
     public void deleteCollaborator(Long collabId) {
         Collaborator collaborator = collaboratorRepository.findById(collabId).orElse(null);
         if (collaborator==null) {
