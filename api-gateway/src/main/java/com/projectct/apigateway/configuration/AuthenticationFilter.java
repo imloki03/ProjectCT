@@ -35,8 +35,13 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         log.info("Start global filter...");
 
-        if (isPublicEndpoint(exchange.getRequest()))
-            return chain.filter(exchange);
+        if (isPublicEndpoint(exchange.getRequest())){
+            ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
+                    .headers(headers -> headers.remove(HttpHeaders.AUTHORIZATION))
+                    .build();
+
+            return chain.filter(exchange.mutate().request(modifiedRequest).build());
+        }
 
         List<String> authHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION);
         if (CollectionUtils.isEmpty(authHeader)) {
