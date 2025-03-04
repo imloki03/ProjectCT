@@ -89,8 +89,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void changePassword(ChangePasswordRequest request) {
-        String username = webUtil.getCurrentUsername();
+    public void changePassword(ChangePasswordRequest request, String username) {
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);

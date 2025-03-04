@@ -31,7 +31,7 @@ public class UserController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
-    @GetMapping({"{username}"})
+    @GetMapping("{username}")
     public ResponseEntity<?> getUserInfo(@PathVariable String username) {
         var userResponse = userService.getUserInfo(username);
         var respondData = RespondData.builder()
@@ -64,9 +64,9 @@ public class UserController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
-    @PatchMapping
-    public ResponseEntity<?> changePassword( @RequestBody ChangePasswordRequest request) {
-        userService.changePassword(request);
+    @PatchMapping("{username}")
+    public ResponseEntity<?> changePassword( @RequestBody ChangePasswordRequest request, @PathVariable String username) {
+        userService.changePassword(request, username);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .desc(MessageUtil.getMessage(MessageKey.CHANGE_PASSWORD_SUCCESS))
