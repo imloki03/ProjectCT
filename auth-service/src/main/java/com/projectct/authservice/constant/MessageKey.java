@@ -10,4 +10,5 @@ public class MessageKey {
     public static final String USER_LOGIN_FAILED = "user.login.failed";
     public static final String CHANGE_PASSWORD_SUCCESS = "user.change.password.success";
     public static final String EDIT_PROFILE_SUCCESS = "user.edit.profile.success";
+    public static final String OTP_INVALID = "otp.invalid";
 }

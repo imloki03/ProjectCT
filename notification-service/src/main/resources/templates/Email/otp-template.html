@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your OTP Code</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background-color: #007bff;
+            padding: 20px;
+            text-align: center;
+        }
+        .header img {
+            max-width: 300px;
+            margin-bottom: 10px;
+        }
+        .header h1 {
+            color: #fff;
+            font-size: 24px;
+            margin: 0;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .otp-code {
+            font-size: 32px;
+            font-weight: bold;
+            color: #007bff;
+            margin: 20px 0;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            text-align: center;
+            padding: 15px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header Section -->
+    <div class="header">
+        <img src="https://firebasestorage.googleapis.com/v0/b/projectctandroid.appspot.com/o/media%%2F1733232250966_logo_with_name.png?alt=media&token=f72c2b41-b28c-4e40-a002-ef8078774a12" alt="Company Logo">
+        <h1>Email Verification</h1>
+    </div>
+    <!-- Content Section -->
+    <div class="content">
+        <p>Hello user,</p>
+        <p>Thank you for using our service. Your One-Time Password (OTP) is:</p>
+        <div class="otp-code">%s</div>
+        <p>Please use this code to complete your authentication.</p>
+        <p>If you did not request this OTP, please ignore this email or contact our support team immediately.</p>
+    </div>
+    <!-- Footer Section -->
+    <div class="footer">
+        <p>
+            <a href="https://projectct.vercel.app">Visit ProjectCT</a> |
+            <a href="mailto:projectct.dev@gmail.com">Contact Support</a>
+        </p>
+    </div>
+</div>
+</body>
+</html>
