@@ -154,4 +154,13 @@ public class UserServiceImpl implements UserService{
             userResponses.add(getUserInfoById(userId));
         return userResponses;
     }
+
+    @Override
+    public UserResponse getUserViaToken() {
+        Long userId = webUtil.getCurrentIdUser();
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null)
+            throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
+        return userMapper.toUserResponse(user);
+    }
 }

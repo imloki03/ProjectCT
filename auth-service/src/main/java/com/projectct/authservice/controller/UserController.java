@@ -31,7 +31,7 @@ public class UserController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
-    @GetMapping("{username}")
+    @GetMapping("u/{username}")
     public ResponseEntity<?> getUserInfo(@PathVariable String username) {
         var userResponse = userService.getUserInfo(username);
         var respondData = RespondData.builder()
@@ -42,9 +42,20 @@ public class UserController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
-    @GetMapping({"u/{userId}"})
+    @GetMapping({"i/{userId}"})
     public ResponseEntity<?> getUserInfoById(@PathVariable Long userId) {
         var userResponse = userService.getUserInfoById(userId);
+        var respondData = RespondData.builder()
+                .status(HttpStatus.OK.value())
+                .data(userResponse)
+                .desc(MessageUtil.getMessage(MessageKey.USER_INFO_SUCCESS))
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
+    @GetMapping({"t"})
+    public ResponseEntity<?> getUserInfoViaToken() {
+        var userResponse = userService.getUserViaToken();
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .data(userResponse)
