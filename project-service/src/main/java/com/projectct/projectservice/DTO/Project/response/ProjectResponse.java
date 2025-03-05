@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class ProjectResponse {
     private Long id;
     private Long ownerId;
+    private String ownerUsername;
     private String name;
     private String description;
     private String avatarURL;

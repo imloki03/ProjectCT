@@ -38,10 +38,12 @@ public class ProjectServiceImpl implements ProjectService{
     public ProjectResponse createNewProject(ProjectRequest request) {
         // gọi service khác để tạo media, message....
         Long ownerId = webUtil.getCurrentIdUser();
+        String ownerUsername = webUtil.getCurrentUsername();
         if (projectRepository.existsByOwnerIdAndName(ownerId, request.getProjectName()))
             throw new AppException(HttpStatus.CONFLICT, MessageUtil.getMessage(MessageKey.PROJECT_CREATE_DUPLICATE));
         Project project = Project.builder()
                 .ownerId(ownerId)
+                .ownerUsername(ownerUsername)
                 .name(request.getProjectName())
                 .description(request.getProjectDescription())
                 .build();
