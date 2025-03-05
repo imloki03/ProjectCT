@@ -19,6 +19,7 @@ public class Project {
     private Long id;
 
     private Long ownerId;
+    private String ownerUsername;
     private String name;
     private String description;
     private String avatarURL;
