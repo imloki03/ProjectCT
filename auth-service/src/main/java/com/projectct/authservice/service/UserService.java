@@ -1,5 +1,6 @@
 package com.projectct.authservice.service;
 
+import com.projectct.authservice.DTO.Tag.response.TagResponse;
 import com.projectct.authservice.DTO.User.request.*;
 import com.projectct.authservice.DTO.User.response.LoginResponse;
 import com.projectct.authservice.DTO.User.response.UserResponse;
@@ -16,5 +17,6 @@ public interface UserService {
     UserResponse getUserInfoById(Long userId);
     List<UserResponse> getUserList(List<Long> userIds);
     UserResponse getUserViaToken();
+    List<TagResponse> getAllTags();
     void checkUserExist(String username);
 }

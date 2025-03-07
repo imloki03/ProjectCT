@@ -1,6 +1,7 @@
 package com.projectct.projectservice.model;
 
 import com.projectct.projectservice.enums.Status;
+import com.projectct.projectservice.model.listener.PhaseListener;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(PhaseListener.class)
 public class Phase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -11,11 +11,13 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProjectResponse {
-    private Long id;
-    private Long ownerId;
-    private String ownerUsername;
-    private String name;
-    private String description;
-    private String avatarURL;
-    private LocalDateTime createdDate;
+    Long id;
+    Long ownerId;
+    String ownerUsername;
+    String name;
+    String description;
+    String avatarURL;
+    LocalDateTime createdDate;
+    LocalDateTime updatedAt;
+
 }

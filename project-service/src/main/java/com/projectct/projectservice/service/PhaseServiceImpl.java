@@ -70,6 +70,7 @@ public class PhaseServiceImpl implements PhaseService {
             throw new AppException(HttpStatus.NOT_FOUND, MessageKey.PHASE_NOT_FOUND);
         }
         phaseMapper.toEditPhase(updatePhaseRequest, phase);
+        phaseRepository.save(phase);
         return phaseMapper.toPhaseResponse(phase);
     }
 
