@@ -163,4 +163,11 @@ public class UserServiceImpl implements UserService{
             throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
         return userMapper.toUserResponse(user);
     }
+
+    @Override
+    public void checkUserExist(String username) {
+        User user = userRepository.findByUsernameOrEmail(username, username);
+        if (user == null)
+            throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
+    }
 }

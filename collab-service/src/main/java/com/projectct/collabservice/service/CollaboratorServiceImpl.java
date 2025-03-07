@@ -46,6 +46,12 @@ public class CollaboratorServiceImpl implements CollaboratorService{
         }
 
         Collaborator newCollab = collabMapper.toCollaborator(collabRequest);
+        Role role = Role.builder()
+                .name("CONTRIBUTOR")
+                .projectId(collabRequest.getProjectId())
+                .build();
+        roleRepository.save(role);
+        newCollab.setRole(role);
         collaboratorRepository.save(newCollab);
     }
 
