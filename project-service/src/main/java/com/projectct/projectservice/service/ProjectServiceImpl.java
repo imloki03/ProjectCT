@@ -1,5 +1,6 @@
 package com.projectct.projectservice.service;
 
+import com.projectct.projectservice.DTO.Collab.request.CollabRequest;
 import com.projectct.projectservice.DTO.Project.request.ProjectRequest;
 import com.projectct.projectservice.DTO.Project.request.UpdateProjectRequest;
 import com.projectct.projectservice.DTO.Project.response.ProjectResponse;
@@ -54,12 +55,27 @@ public class ProjectServiceImpl implements ProjectService{
         project.setBacklog(backlog);
         projectRepository.save(project);
         kafkaProducer.sendMessage(KafkaTopic.INIT_PROJECT, project.getId());
+
+        CollabRequest collabRequest = CollabRequest.builder()
+                                    .projectId(project.getId())
+                                    .userId(ownerId)
+                                    .build();
+        kafkaProducer.sendMessage(KafkaTopic.INIT_PROJECT_OWNER_COLLAB, collabRequest);
         return projectMapper.toProjectResponse(project);
     }
 
     @Override
     public ProjectResponse getProject(Long projectId) {
         Project project = projectRepository.findById(projectId).orElse(null);
+        if (project == null)
+            throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.PROJECT_NOT_FOUND));
+        return projectMapper.toProjectResponse(project);
+    }
+
+
+    @Override
+    public ProjectResponse getProjectByOwnerAndName(String ownerUsername, String projectName) {
+        Project project = projectRepository.findByOwnerUsernameAndName(ownerUsername, projectName);
         if (project == null)
             throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.PROJECT_NOT_FOUND));
         return projectMapper.toProjectResponse(project);

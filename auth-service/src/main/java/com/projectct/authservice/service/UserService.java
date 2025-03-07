@@ -16,4 +16,5 @@ public interface UserService {
     UserResponse getUserInfoById(Long userId);
     List<UserResponse> getUserList(List<Long> userIds);
     UserResponse getUserViaToken();
+    void checkUserExist(String username);
 }

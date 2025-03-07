@@ -12,4 +12,5 @@ public interface ProjectService {
     List<ProjectResponse> getAllProjects();
     ProjectResponse updateProject(Long projectId, UpdateProjectRequest request);
     void deleteProject(Long projectId);
+    ProjectResponse getProjectByOwnerAndName(String ownerUsername, String projectName);
 }

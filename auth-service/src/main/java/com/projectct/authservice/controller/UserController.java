@@ -114,4 +114,13 @@ public class UserController {
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
+
+    @PatchMapping("exist/{username}")
+    public ResponseEntity<?> checkUserExist(@PathVariable String username) {
+        userService.checkUserExist(username);
+        var respondData = RespondData.builder()
+                .status(HttpStatus.OK.value())
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
 }

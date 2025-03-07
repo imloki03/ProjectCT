@@ -40,6 +40,16 @@ public class ProjectController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
+    @GetMapping("{ownerUsername}/{projectName}")
+    public ResponseEntity<?> getProjectByOwnerAndName(@PathVariable String ownerUsername, @PathVariable String projectName){
+        var project = projectService.getProjectByOwnerAndName(ownerUsername, projectName);
+        var respondData = RespondData.builder()
+                .status(HttpStatus.OK.value())
+                .data(project)
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
     @GetMapping
     public ResponseEntity<?> getAllProjects(){
         var projects = projectService.getAllProjects();

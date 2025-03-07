@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -29,7 +30,13 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     final AuthService authService;
     final ObjectMapper objectMapper;
 
-    private String[] publicEndpoints = {"/auth/users/login", "/auth/users"};
+    private final List<String> publicEndpoints = List.of(
+            "POST:/auth/users/login",
+            "POST:/auth/users",
+            "GET:/auth/users/exist/**",
+            "GET:/auth/otp/**",
+            "POST:/auth/otp/verify/**/**"
+    );
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -62,12 +69,14 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         return -1;
     }
 
-    private boolean isPublicEndpoint(ServerHttpRequest request){
-        return Arrays.stream(publicEndpoints)
-                .anyMatch(s -> request
-                        .getURI()
-                        .getPath()
-                        .matches(s));
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
+    private boolean isPublicEndpoint(ServerHttpRequest request) {
+        String key = request.getMethod().name() + ":" + request.getURI().getPath();
+        return publicEndpoints.stream().anyMatch(pattern -> {
+            String[] parts = pattern.split(":", 2);
+            return parts[0].equalsIgnoreCase(request.getMethod().name()) && pathMatcher.match(parts[1], request.getURI().getPath());
+        });
     }
 
     Mono<Void> unauthenticated(ServerHttpResponse response) {
