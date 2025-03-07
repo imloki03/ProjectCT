@@ -1,12 +1,15 @@
 package com.projectct.authservice.service;
 
 import com.projectct.authservice.DTO.Authentication.AuthenticationResponse;
+import com.projectct.authservice.DTO.Tag.response.TagResponse;
 import com.projectct.authservice.DTO.User.request.*;
 import com.projectct.authservice.DTO.User.response.LoginResponse;
 import com.projectct.authservice.DTO.User.response.UserResponse;
 import com.projectct.authservice.constant.KafkaTopic;
 import com.projectct.authservice.exception.AppException;
+import com.projectct.authservice.mapper.TagMapper;
 import com.projectct.authservice.mapper.UserMapper;
+import com.projectct.authservice.model.Tag;
 import com.projectct.authservice.model.User;
 import com.projectct.authservice.model.UserStatus;
 import com.projectct.authservice.redis.UserCachePublisher;
@@ -26,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,6 +37,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService{
     final UserRepository userRepository;
     final UserMapper userMapper;
+    final TagMapper tagMapper;
     final PasswordEncoder passwordEncoder;
     final JwtUtil jwtUtil;
     final WebUtil webUtil;
@@ -169,5 +174,11 @@ public class UserServiceImpl implements UserService{
         User user = userRepository.findByUsernameOrEmail(username, username);
         if (user == null)
             throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
+    }
+
+    @Override
+    public List<TagResponse> getAllTags() {
+        List<Tag> tags = tagRepository.findAll();
+        return tagMapper.toTagResponseList(tags);
     }
 }

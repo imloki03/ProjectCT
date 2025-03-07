@@ -123,4 +123,14 @@ public class UserController {
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
+
+    @GetMapping("tag")
+    public ResponseEntity<?> getAllTags() {
+        var tags = userService.getAllTags();
+        var respondData = RespondData.builder()
+                .status(HttpStatus.OK.value())
+                .data(tags)
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
 }
