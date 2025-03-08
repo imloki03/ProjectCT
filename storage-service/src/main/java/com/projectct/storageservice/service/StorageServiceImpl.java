@@ -89,6 +89,16 @@ public class StorageServiceImpl implements StorageService{
 
     @Override
     public void deleteMedia(Long mediaId) {
+        Media currentMedia = mediaRepository.findById(mediaId).orElse(null);
+        if (currentMedia == null)
+            throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.MEDIA_NOT_FOUND));
+        Media newerVersion = mediaRepository.findByPreviousVersion_Id(mediaId);
+        Media previousVersion = currentMedia.getPreviousVersion();
+
+        if (newerVersion != null) {
+            newerVersion.setPreviousVersion(previousVersion);
+            mediaRepository.saveAndFlush(newerVersion);
+        }
         mediaRepository.deleteById(mediaId);
     }
 

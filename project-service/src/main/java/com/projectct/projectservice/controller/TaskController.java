@@ -45,8 +45,10 @@ public class TaskController {
     }
 
     @GetMapping("backlog/{projectId}")
-    public ResponseEntity<?> getTasksInBacklog(@PathVariable Long projectId){
-        var tasks = taskService.getTasksInBacklog(projectId);
+    public ResponseEntity<?> getTasksInBacklog(@PathVariable Long projectId,
+                                               @RequestParam(defaultValue = "0") int page,
+                                               @RequestParam(defaultValue = "10") int size){
+        var tasks = taskService.getTasksInBacklog(projectId, page, size);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .data(tasks)
@@ -55,8 +57,10 @@ public class TaskController {
     }
 
     @GetMapping("phase/{phaseId}")
-    public ResponseEntity<?> getTasksInPhase(@PathVariable Long phaseId){
-        var tasks = taskService.getTasksInPhase(phaseId);
+    public ResponseEntity<?> getTasksInPhase(@PathVariable Long phaseId,
+                                             @RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "10") int size){
+        var tasks = taskService.getTasksInPhase(phaseId, page, size);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .data(tasks)

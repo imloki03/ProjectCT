@@ -3,8 +3,10 @@ package com.projectct.projectservice.model;
 import com.projectct.projectservice.enums.Priority;
 import com.projectct.projectservice.enums.Status;
 import com.projectct.projectservice.enums.TaskType;
+import com.projectct.projectservice.model.listener.TaskListener;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(TaskListener.class)
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +32,10 @@ public class Task {
     private String description;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdDate;
 
     @Enumerated(EnumType.STRING)
     private Priority priority;

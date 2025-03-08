@@ -3,6 +3,8 @@ package com.projectct.projectservice.service;
 import com.projectct.projectservice.DTO.Task.request.TaskRequest;
 import com.projectct.projectservice.DTO.Task.request.UpdateTaskRequest;
 import com.projectct.projectservice.DTO.Task.request.UpdateTaskStatusRequest;
+import com.projectct.projectservice.DTO.Task.response.PageableTaskResponse;
+import com.projectct.projectservice.DTO.Task.response.PagingTaskResponse;
 import com.projectct.projectservice.DTO.Task.response.TaskResponse;
 import com.projectct.projectservice.DTO.Task.response.TaskStatistic;
 import com.projectct.projectservice.constant.MessageKey;
@@ -19,12 +21,17 @@ import com.projectct.projectservice.repository.TaskRepository;
 import com.projectct.projectservice.util.MessageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -64,23 +71,57 @@ public class TaskServiceImpl implements TaskService{
     }
 
     @Override
-    public List<TaskResponse> getTasksInBacklog(Long projectId) {
-        List<Task> tasks = taskRepository.findByBacklog_Project_Id(projectId);
-        return taskMapper.toTaskResponseList(tasks);
+    public PagingTaskResponse getTasksInBacklog(Long projectId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size,
+                Sort.by(Sort.Order.asc("status"), Sort.Order.desc("createdDate")));
+
+        Page<Task> taskPage = taskRepository.findByBacklog_Project_IdAndParentTaskIsNull(projectId, pageable);
+        long totalTasks = taskRepository.countByBacklog_Project_Id(projectId);
+
+        return PagingTaskResponse.builder()
+                .content(taskPage.getContent().stream()
+                        .map(this::convertToPageableTaskResponse)
+                        .collect(Collectors.toList()))
+                .totalTasks(totalTasks)
+                .build();
     }
 
+    private PageableTaskResponse convertToPageableTaskResponse(Task task) {
+        return PageableTaskResponse.builder()
+                .key(task.getId())
+                .data(taskMapper.toTaskResponse(task))
+                .children(task.getSubTask().stream()
+                        .map(this::convertToPageableTaskResponse)
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+
     @Override
-    public List<TaskResponse> getTasksInPhase(Long phaseId) {
+    public PagingTaskResponse getTasksInPhase(Long phaseId, int page, int size) {
         Phase phase = phaseRepository.findById(phaseId).orElse(null);
         if (phase == null)
             throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.PHASE_NOT_FOUND));
-        return taskMapper.toTaskResponseList(phase.getTaskList());
+
+        Pageable pageable = PageRequest.of(page, size,
+                Sort.by(Sort.Order.asc("status"), Sort.Order.desc("createdDate")));
+
+        Page<Task> taskPage = taskRepository.findByPhase_IdAndParentTaskIsNull(phaseId, pageable);
+
+        long totalTasks = taskRepository.countByPhase_Id(phaseId);
+
+        return PagingTaskResponse.builder()
+                .content(taskPage.getContent().stream()
+                        .map(this::convertToPageableTaskResponse)
+                        .collect(Collectors.toList()))
+                .totalTasks(totalTasks)
+                .build();
     }
 
     @Override
     public TaskStatistic getTaskStatistic(Long projectId) {
-        Long upcoming = (long) getTasksInBacklog(projectId).size();
-        Long completed = (long) taskRepository.findByBacklog_Project_IdAndStatus(projectId, Status.DONE).size();
+        Long upcoming = (long) taskRepository.findByBacklog_Project_Id(projectId).size();
+        Long completed = (long) taskRepository.findByPhase_Project_IdAndStatus(projectId, Status.DONE).size();
         Long total = (long) taskRepository.findByBacklog_Project_IdOrPhase_Project_Id(projectId, projectId).size();
         Long inProgress = total - completed - upcoming;
         return TaskStatistic.builder()
