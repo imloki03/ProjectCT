@@ -16,4 +16,5 @@ public class UserResponse {
     String email;
     String gender;
     String avatarURL;
+    String fcmToken;
 }

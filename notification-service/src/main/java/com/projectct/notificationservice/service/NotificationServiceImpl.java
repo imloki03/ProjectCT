@@ -1,10 +1,6 @@
 package com.projectct.notificationservice.service;
 
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
-import com.google.firebase.messaging.TopicManagementResponse;
-import com.projectct.notificationservice.DTO.FCMToken.request.FCMTokenRequest;
+import com.google.firebase.messaging.*;
 import com.projectct.notificationservice.DTO.Subcribe.request.SubscriptionRequest;
 import com.projectct.notificationservice.constant.MessageKey;
 import com.projectct.notificationservice.exception.AppException;
@@ -24,39 +20,24 @@ public class NotificationServiceImpl implements NotificationService {
     private final FirebaseMessaging firebaseMessaging;
 
     @Override
-    public void sendMessageToTopic(String topic) {
-        Notification notification = Notification.builder()
-                .setTitle("Test Notification")
-                .setBody("This is a test message for topic: " + topic)
-                .build();
-
-        Message message = Message.builder()
-                .setTopic(topic)
-                .setNotification(notification)
-                .build();
-
-        try {
-            String response = firebaseMessaging.send(message);
-            log.info("Successfully sent test message to topic: {}", response);
-        } catch (Exception e) {
-            log.info("Failed to send test message to topic: {} ", e.getMessage());
-        }
-    }
-
-    @Override
-    public void subscribeToTopics(SubscriptionRequest request) {
+    public String subscribeToTopics(SubscriptionRequest request) {
         String token = request.getToken();
         List<String> topics = request.getTopics();
+        StringBuilder result = new StringBuilder();
+
         try {
             for (String topic : topics) {
-                TopicManagementResponse response = firebaseMessaging.subscribeToTopic(List.of(token), topic);
-                log.info("Subscribed to topic: {} with {} successes and {} failures",
-                        topic, response.getSuccessCount(), response.getFailureCount());
+                TopicManagementResponse response = FirebaseMessaging.getInstance()
+                        .subscribeToTopic(List.of(token), topic);
+
+                result.append(String.format("Subscribed to topic: %s with %d successes and %d failures%n",
+                        topic, response.getSuccessCount(), response.getFailureCount()));
             }
-            log.info("Successfully subscribed to topics: {}", topics);
         } catch (Exception e) {
-            log.error("Failed to subscribe to topics");
+            log.error("Failed to subscribe to topics", e);
+            return "Subscription failed due to an error.";
         }
+        return result.toString();
     }
 
     @Override
@@ -67,5 +48,18 @@ public class NotificationServiceImpl implements NotificationService {
         }
         notification.setRead(true);
         notificationRepository.save(notification);
+    }
+
+    @Override
+    public String unsubscribeToTopic(SubscriptionRequest request) {
+        String token = request.getToken();
+        for (String topic : request.getTopics()) {
+            try {
+                firebaseMessaging.unsubscribeFromTopic(List.of(token), topic);
+            } catch (FirebaseMessagingException e) {
+                return "Subscription failed due to an error.";
+            }
+        }
+        return "Successfully unsubscribed from topic: " + request.getTopics().getFirst();
     }
 }

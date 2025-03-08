@@ -89,7 +89,11 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserResponse getUserInfo(String username) {
-        return userCachedService.getUser(username);
+        User user = userRepository.findByUsernameOrEmail(username, username);
+        if (user == null) {
+            throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
+        }
+         return userMapper.toUserResponse(user);
     }
 
     @Override
@@ -166,7 +170,10 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void checkUserExist(String username) {
-        userCachedService.getUser(username);
+        User user = userRepository.findByUsernameOrEmail(username, username);
+        if (user == null) {
+            throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
+        }
     }
 
     @Override

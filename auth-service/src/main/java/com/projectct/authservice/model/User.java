@@ -25,6 +25,7 @@ public class User {
     private String password;
     private String gender;
     private String avatarURL;
+    private String fcmToken;
 
     @ManyToMany
     @JoinTable(

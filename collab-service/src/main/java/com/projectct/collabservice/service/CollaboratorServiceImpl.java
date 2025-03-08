@@ -3,6 +3,7 @@ package com.projectct.collabservice.service;
 import com.projectct.collabservice.DTO.Collaborator.request.CollabRequest;
 import com.projectct.collabservice.DTO.Collaborator.request.CollabRoleUpdateRequest;
 import com.projectct.collabservice.DTO.Collaborator.response.CollabResponse;
+import com.projectct.collabservice.DTO.Collaborator.response.CollabWithoutUserResponse;
 import com.projectct.collabservice.DTO.Notification.request.DirectNotificationRequest;
 import com.projectct.collabservice.DTO.User.response.UserResponse;
 import com.projectct.collabservice.constant.KafkaTopic;
@@ -17,6 +18,7 @@ import com.projectct.collabservice.repository.CollaboratorRepository;
 import com.projectct.collabservice.repository.RoleRepository;
 import com.projectct.collabservice.repository.httpclient.AuthClient;
 import com.projectct.collabservice.util.KafkaProducer;
+import com.projectct.collabservice.util.WebUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +37,8 @@ public class CollaboratorServiceImpl implements CollaboratorService{
     final CollabMapper collabMapper;
     final AuthClient authClient;
     final CachedUserService cachedUserService;
-    final FCMTokenCacheService fcmTokenCacheService;
     final KafkaProducer kafkaProducer;
+    final WebUtil webUtil;
 
     @Override
     public void createCollab(CollabRequest collabRequest) {
@@ -82,9 +84,18 @@ public class CollaboratorServiceImpl implements CollaboratorService{
 
     @Override
     public void inviteCollaborator(DirectNotificationRequest request) {
-        request.setToken(fcmTokenCacheService.getFCMToken(request.getRecipient()).replaceAll("^\"|\"$", ""));
+        request.setToken(cachedUserService.getUserInfo(request.getRecipient()).getFcmToken());
         request.setType(NotificationType.INVITE_NOTIFICATION);
         kafkaProducer.sendMessage(KafkaTopic.USER_DIRECT_NOTIFICATION, request);
+    }
+
+    @Override
+    public CollabWithoutUserResponse getCurrentCollab(Long currentProjectId) {
+        Collaborator collaborator = collaboratorRepository.findByProjectIdAndUserId(currentProjectId, webUtil.getCurrentIdUser());
+        if (collaborator==null) {
+            throw new AppException(HttpStatus.NOT_FOUND, MessageKey.COLLAB_NOT_FOUND);
+        }
+        return collabMapper.toResponseWithoutUser(collaborator);
     }
 
     @Override
