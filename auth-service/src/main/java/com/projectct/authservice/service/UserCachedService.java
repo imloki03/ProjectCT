@@ -11,9 +11,6 @@ public interface UserCachedService {
     @Cacheable(value = "userInfo", key = "#userId", unless = "#result == null")
     UserResponse getUserById(Long userId);
 
-    @Cacheable(value = "userInfo", key = "#userId", unless = "#result == null")
-    UserResponse getUser(String username);
-
     @CachePut(value = "userInfo", key = "#id", unless = "#result == null")
     UserResponse updateUser(User user);
 

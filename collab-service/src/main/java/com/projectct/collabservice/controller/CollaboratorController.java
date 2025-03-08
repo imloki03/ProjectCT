@@ -3,6 +3,7 @@ package com.projectct.collabservice.controller;
 import com.projectct.collabservice.DTO.Collaborator.request.CollabRequest;
 import com.projectct.collabservice.DTO.Collaborator.request.CollabRoleUpdateRequest;
 import com.projectct.collabservice.DTO.Collaborator.response.CollabResponse;
+import com.projectct.collabservice.DTO.Collaborator.response.CollabWithoutUserResponse;
 import com.projectct.collabservice.DTO.Notification.request.DirectNotificationRequest;
 import com.projectct.collabservice.DTO.RespondData;
 import com.projectct.collabservice.constant.MessageKey;
@@ -45,7 +46,18 @@ public class CollaboratorController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
-    @GetMapping("/p/{projectId}")
+    @GetMapping("current/p/{currentProjectId}")
+    public ResponseEntity<?> getCurrentCollab(@PathVariable Long currentProjectId) {
+        CollabWithoutUserResponse collabResponse = collaboratorService.getCurrentCollab(currentProjectId);
+        var respondData = RespondData
+                .builder()
+                .status(HttpStatus.OK.value())
+                .data(collabResponse)
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
+    @GetMapping("p/{projectId}")
     public ResponseEntity<?> getAllCollabFromProject(@PathVariable Long projectId) {
         List<CollabResponse> collabResponses = collaboratorService.getAllCollabFromProject(projectId);
         var respondData = RespondData

@@ -13,4 +13,5 @@ public class EditProfileRequest {
      String gender;
      List<Long> tagList;
      String avatarURL;
+     String fcmToken;
 }

@@ -19,6 +19,7 @@ public class UserResponse {
     String email;
     String gender;
     String avatarURL;
+    String fcmToken;
     List<TagResponse> tagList;
     UserStatusResponse status;
 }
