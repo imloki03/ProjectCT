@@ -33,7 +33,7 @@ public class Media {
 
     private String link;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne
     @JoinColumn(name = "previous_version_id")
     private Media previousVersion;
 

@@ -23,6 +23,7 @@ public class TaskResponse {
     String description;
     LocalDateTime startTime;
     LocalDateTime endTime;
+    LocalDateTime createdDate;
     Priority priority;
     Status status;
     Long parentTaskId;

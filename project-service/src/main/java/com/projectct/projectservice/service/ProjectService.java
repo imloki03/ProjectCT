@@ -13,4 +13,5 @@ public interface ProjectService {
     ProjectResponse updateProject(Long projectId, UpdateProjectRequest request);
     void deleteProject(Long projectId);
     ProjectResponse getProjectByOwnerAndName(String ownerUsername, String projectName);
+    void updateProjectTimestamp(Long projectId);
 }

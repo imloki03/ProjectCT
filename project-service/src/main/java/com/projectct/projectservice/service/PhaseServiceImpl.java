@@ -63,6 +63,7 @@ public class PhaseServiceImpl implements PhaseService {
         return phaseMapper.toPhaseResponseList(phaseList);
     }
 
+    @Transactional
     @Override
     public PhaseResponse updatePhase(Long phaseId, UpdatePhaseRequest updatePhaseRequest) {
         Phase phase = phaseRepository.findById(phaseId).orElse(null);
