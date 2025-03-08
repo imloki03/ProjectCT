@@ -33,8 +33,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     private final List<String> publicEndpoints = List.of(
             "POST:/auth/users/login",
             "POST:/auth/users",
-            "GET:/auth/users/exist/**",
-            "GET:/auth/otp/**",
+            "PATCH:/auth/users/**",
+            "PATCH:/auth/users/exist",
+            "POST:/auth/otp/**",
             "POST:/auth/otp/verify/**/**",
             "POST:/auth/jwt/refresh"
     );
