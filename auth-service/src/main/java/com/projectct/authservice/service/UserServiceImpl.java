@@ -45,6 +45,7 @@ public class UserServiceImpl implements UserService{
     final UserStatusRepository userStatusRepository;
     final UserCachePublisher userCachePublisher;
     final KafkaProducer kafkaProducer;
+    final UserCachedService userCachedService;
 
     @Override
     @Transactional
@@ -58,13 +59,14 @@ public class UserServiceImpl implements UserService{
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
 
         UserStatus newUserStatus = UserStatus.builder()
-                .isNew(true)
+                .newUser(true)
                 .build();
         userRepository.save(newUser);
         newUserStatus.setUser(newUser);
         userStatusRepository.save(newUserStatus);
         newUser.setStatus(newUserStatus);
         userRepository.save(newUser);
+        userCachedService.updateUser(newUser);
         kafkaProducer.sendMessage(KafkaTopic.INIT_USER, newUser.getId());
     }
 
@@ -87,26 +89,24 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserResponse getUserInfo(String username) {
-        User user = userRepository.findByUsernameOrEmail(username, username);
-        if (user == null)
-            throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
-        return userMapper.toUserResponse(user);
+        return userCachedService.getUser(username);
     }
 
     @Override
     public void changePassword(ChangePasswordRequest request, String username) {
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsernameOrEmail(username, username);
         if (user == null) {
             throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
         }
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+        userCachedService.updateUser(user);
     }
 
     @Override
     public UserResponse editProfile(EditProfileRequest request) {
         String username = webUtil.getCurrentUsername();
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsernameOrEmail(username, username);
         if (user == null) {
             throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
         }
@@ -117,7 +117,8 @@ public class UserServiceImpl implements UserService{
             user.setTagList(tagRepository.findAllById(request.getTagList()));
         }
         userRepository.save(user);
-
+        userCachedService.updateUser(user);
+//      #Collab cache
         userCachePublisher.publish(userMapper.toUserResponse(user));
 
         return userMapper.toUserResponse(user);
@@ -133,52 +134,45 @@ public class UserServiceImpl implements UserService{
 
         if (!user.getStatus().isActivated())
             user.setStatus(UserStatus.builder().
-                        isActivated(request.isActive()).
+                        activated(request.isActive()).
                         build());
 
-        if (user.getStatus().isNew())
+        if (user.getStatus().isNewUser())
             user.setStatus(UserStatus.builder().
-                        isNew(request.isNew())
+                        newUser(request.isNew())
                         .build());
 
         userRepository.save(user);
+        userCachedService.updateUser(user);
     }
 
     @Override
     public UserResponse getUserInfoById(Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null)
-            throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
-        return userMapper.toUserResponse(user);
+        return userCachedService.getUserById(userId);
     }
 
     @Override
     public List<UserResponse> getUserList(List<Long> userIds) {
-        List<UserResponse> userResponses = new ArrayList<>();
-        for (Long userId : userIds)
-            userResponses.add(getUserInfoById(userId));
-        return userResponses;
+        return userIds.stream()
+                .map(userCachedService::getUserById)
+                .toList();
     }
 
     @Override
     public UserResponse getUserViaToken() {
         Long userId = webUtil.getCurrentIdUser();
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null)
-            throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
-        return userMapper.toUserResponse(user);
+        return userCachedService.getUserById(userId);
     }
 
     @Override
     public void checkUserExist(String username) {
-        User user = userRepository.findByUsernameOrEmail(username, username);
-        if (user == null)
-            throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
+        userCachedService.getUser(username);
     }
 
     @Override
     public List<TagResponse> getAllTags() {
         List<Tag> tags = tagRepository.findAll();
-        return tagMapper.toTagResponseList(tags);
+//        return tagMapper.toTagResponseList(tags);
+        return null;
     }
 }

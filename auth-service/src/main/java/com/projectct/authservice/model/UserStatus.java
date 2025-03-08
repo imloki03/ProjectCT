@@ -14,9 +14,9 @@ public class UserStatus {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private boolean isActivated;
+    private boolean activated;
 
-    private boolean isNew;
+    private boolean newUser;
 
     @OneToOne
     private User user;
