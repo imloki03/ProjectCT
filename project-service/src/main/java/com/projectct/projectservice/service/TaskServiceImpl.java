@@ -198,7 +198,9 @@ public class TaskServiceImpl implements TaskService{
 
     @Transactional
     @Override
-    public void moveTaskToPhase(Long taskId, Long phaseId) {
+    public void moveTaskToPhase(Long taskId, Long phaseId, UpdateTaskRequest request) {
+        updateTask(taskId, request);
+
         Phase phase = phaseRepository.findById(phaseId).orElse(null);
         if (phase == null)
             throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.PHASE_NOT_FOUND));

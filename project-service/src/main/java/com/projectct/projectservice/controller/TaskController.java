@@ -124,8 +124,10 @@ public class TaskController {
     }
 
     @PatchMapping("move/{taskId}/{phaseId}")
-    public ResponseEntity<?> moveTaskToPhase(@PathVariable Long taskId, @PathVariable Long phaseId){
-        taskService.moveTaskToPhase(taskId, phaseId);
+    public ResponseEntity<?> moveTaskToPhase(@PathVariable Long taskId,
+                                             @PathVariable Long phaseId,
+                                             @RequestBody UpdateTaskRequest request){
+        taskService.moveTaskToPhase(taskId, phaseId, request);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .desc(MessageUtil.getMessage(MessageKey.TASK_MOVE_PHASE_SUCCESS))

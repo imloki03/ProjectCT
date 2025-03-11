@@ -22,7 +22,7 @@ public interface TaskService {
     TaskResponse updateTask(Long taskId, UpdateTaskRequest request);
     TaskResponse updateTaskStatus(Long taskId, UpdateTaskStatusRequest request);
     TaskResponse assignTask(Long taskId, Long collabId);
-    void moveTaskToPhase(Long taskId, Long phaseId);
+    void moveTaskToPhase(Long taskId, Long phaseId, UpdateTaskRequest request);
     void moveTaskToBacklog(Long taskId);
     void deleteTask(Long taskId);
 }
