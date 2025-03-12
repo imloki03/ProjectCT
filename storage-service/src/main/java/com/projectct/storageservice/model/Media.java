@@ -37,6 +37,10 @@ public class Media {
     @JoinColumn(name = "previous_version_id")
     private Media previousVersion;
 
+    @OneToOne
+    @JoinColumn(name = "newer_version_id")
+    private Media newerVersion;
+
     @ManyToOne
     @JoinColumn(name = "storage_id")
     private Storage storage;

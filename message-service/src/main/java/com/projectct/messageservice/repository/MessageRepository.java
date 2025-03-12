@@ -13,4 +13,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     List<Message> findByChatbox_ProjectIdAndIsPinnedTrue(Long projectId);
 
     List<Message> findByChatbox_ProjectIdAndContentContains(Long projectId, String content);
+
+    Page<Message> findByChatbox_ProjectIdAndIdLessThan(Long projectId, Long id, Pageable pageable);
 }

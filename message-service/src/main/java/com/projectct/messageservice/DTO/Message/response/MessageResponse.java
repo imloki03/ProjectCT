@@ -14,7 +14,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MessageResponse {
     Long id;
-    UserResponse user;
+    UserResponse sender;
     String content;
     String project;
     LocalDateTime sentTime;

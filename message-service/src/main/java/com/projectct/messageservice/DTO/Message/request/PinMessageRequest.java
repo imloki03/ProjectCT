@@ -8,4 +8,5 @@ import lombok.experimental.FieldDefaults;
 public class PinMessageRequest {
     Long pinMessageId;
     Long projectId;
+    String authToken;
 }

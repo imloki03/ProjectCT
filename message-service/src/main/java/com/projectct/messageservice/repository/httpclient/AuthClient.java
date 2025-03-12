@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "auth-service")
 public interface AuthClient {
-    @GetMapping(value = "/users/u/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/users/i/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     RespondData<UserResponse> getUserInfo(@PathVariable Long userId);
 }

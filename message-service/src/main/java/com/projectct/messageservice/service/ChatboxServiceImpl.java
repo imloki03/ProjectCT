@@ -2,7 +2,6 @@ package com.projectct.messageservice.service;
 
 import com.projectct.messageservice.DTO.Message.response.MessageResponse;
 import com.projectct.messageservice.mapper.MessageMapper;
-import com.projectct.messageservice.model.Chatbox;
 import com.projectct.messageservice.model.Message;
 import com.projectct.messageservice.repository.ChatboxRepository;
 import com.projectct.messageservice.repository.MessageRepository;
@@ -11,10 +10,7 @@ import com.projectct.messageservice.repository.httpclient.StorageClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,12 +26,6 @@ public class ChatboxServiceImpl implements ChatboxService {
         final AuthClient authClient;
         final StorageClient storageClient;
 
-    @Override
-    public Page<MessageResponse> getMessagesByProject(Long projectId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "sentTime"));
-        Page<Message> messages = messageRepository.findByChatbox_ProjectId(projectId, pageable);
-        return messages.map(this::fetchFromClients);
-    }
 
     @Override
     public List<MessageResponse> getPinnedMessagesByProject(Long projectId) {
@@ -49,10 +39,19 @@ public class ChatboxServiceImpl implements ChatboxService {
         return messages.stream().map(this::fetchFromClients).collect(Collectors.toList());
     }
 
+    @Override
+    public Page<MessageResponse> getMessagesByProject(Long projectId, Long lastMessageId, Pageable pageable) {
+        if (lastMessageId == null || lastMessageId <= 0) {
+            lastMessageId = Long.MAX_VALUE;
+        }
+        Page<Message> messages = messageRepository.findByChatbox_ProjectIdAndIdLessThan(projectId, lastMessageId, pageable);
+        return messages.map(this::fetchFromClients);
+    }
+
     //cải tiến
     private MessageResponse fetchFromClients(Message message) {
         MessageResponse response = messageMapper.toMessageResponse(message);
-        response.setUser(authClient.getUserInfo(message.getSenderId()).getData());
+        response.setSender(authClient.getUserInfo(message.getSenderId()).getData());
         if (message.getMediaId() != null) {
             response.setMedia(storageClient.getMediaInfo(message.getMediaId()).getData());
         }

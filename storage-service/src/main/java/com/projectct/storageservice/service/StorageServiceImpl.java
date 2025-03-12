@@ -1,8 +1,8 @@
 package com.projectct.storageservice.service;
 
 import com.projectct.storageservice.DTO.Media.request.MediaRequest;
+import com.projectct.storageservice.DTO.Media.response.MediaPagingResponse;
 import com.projectct.storageservice.DTO.Media.response.MediaResponse;
-import com.projectct.storageservice.DTO.Storage.response.StorageResponse;
 import com.projectct.storageservice.constant.MessageKey;
 import com.projectct.storageservice.enums.MediaType;
 import com.projectct.storageservice.exception.AppException;
@@ -15,10 +15,13 @@ import com.projectct.storageservice.repository.StorageRepository;
 import com.projectct.storageservice.util.MessageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -55,11 +58,37 @@ public class StorageServiceImpl implements StorageService{
     }
 
     @Override
-    public List<MediaResponse> getStorageMedia(Long projectId) {
+    public MediaPagingResponse getStorageMedia(Long projectId, Pageable pageable) {
         Storage storage = storageRepository.findByProjectId(projectId);
         if (storage == null)
             throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.STORAGE_NOT_FOUND));
-        return mediaMapper.toMediaResponseList(storage.getMediaList());
+
+        List<Media> mainMediaList = mediaRepository.findByStorageAndNewerVersionNull(storage, pageable);
+
+        List<Media> previousVersionsList = mainMediaList.stream()
+                .filter(media -> media.getPreviousVersion() != null)
+                .flatMap(media -> getPreviousVersionList(media.getPreviousVersion()).stream())
+                .toList();
+
+        long totalMediaCount = mediaRepository.countByStorageAndPreviousVersionNull(storage);
+
+        return MediaPagingResponse.builder()
+                .mediaList(new PageImpl<>(mediaMapper.toMediaResponseList(mainMediaList), pageable, totalMediaCount))
+                .additionalMediaList(mediaMapper.toMediaResponseList(previousVersionsList))
+                .build();
+    }
+
+
+    private List<Media> getPreviousVersionList(Media media){
+        List<Media> mediaList = new ArrayList<>();
+        if (media.getPreviousVersion() != null)
+        {
+            mediaList.add(mediaRepository.findById(media.getId()).orElse(null));
+            mediaList.addAll(getPreviousVersionList(media.getPreviousVersion()));
+            return mediaList;
+        }
+        mediaList.add(mediaRepository.findById(media.getId()).orElse(null));
+        return mediaList;
     }
 
     @Override
@@ -84,6 +113,8 @@ public class StorageServiceImpl implements StorageService{
         newVersion.setPreviousVersion(media);
         newVersion.setStorage(media.getStorage());
         mediaRepository.save(newVersion);
+        media.setNewerVersion(newVersion);
+        mediaRepository.save(media);
         return mediaMapper.toMediaResponse(newVersion);
     }
 

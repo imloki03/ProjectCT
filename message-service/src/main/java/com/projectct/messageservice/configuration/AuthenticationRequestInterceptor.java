@@ -1,21 +1,19 @@
 package com.projectct.messageservice.configuration;
 
+import com.projectct.messageservice.util.FeignRequestContextUtil;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Component
 public class AuthenticationRequestInterceptor implements RequestInterceptor {
     @Override
     public void apply(RequestTemplate template) {
-        ServletRequestAttributes servletRequestAttributes =
-                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        var authHeader = servletRequestAttributes.getRequest().getHeader("Authorization");
+        String authHeader = FeignRequestContextUtil.getAuthToken();
 
-        if (StringUtils.hasText(authHeader))
+        if (StringUtils.hasText(authHeader)) {
             template.header("Authorization", authHeader);
+        }
     }
 }

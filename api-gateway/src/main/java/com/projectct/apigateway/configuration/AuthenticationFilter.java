@@ -44,6 +44,11 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         log.info("Start global filter...");
 
+        if ("websocket".equalsIgnoreCase(exchange.getRequest().getHeaders().getUpgrade())) {
+            log.info("WebSocket request detected, bypassing authentication filter.");
+            return chain.filter(exchange);
+        }
+
         if (isPublicEndpoint(exchange.getRequest())){
             ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
                     .headers(headers -> headers.remove(HttpHeaders.AUTHORIZATION))
