@@ -10,4 +10,5 @@ public class ReadMessageRequest {
     Long pinMessageId;
     Long projectId;
     String username;
+    String authToken;
 }

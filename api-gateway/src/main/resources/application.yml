@@ -28,6 +28,14 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: message-service-websocket
+          uri: lb:ws://message-service
+          predicates:
+            - Path=/ws
+          filters:
+            - StripPrefix=0
+
+        # REST API Route
         - id: message-service
           uri: lb://message-service
           predicates:

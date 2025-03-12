@@ -10,4 +10,5 @@ public class MessageRequest {
      Long projectId;
      String content;
      Long mediaId;
+     String authToken;
 }

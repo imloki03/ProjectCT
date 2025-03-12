@@ -7,6 +7,7 @@ import com.projectct.storageservice.service.StorageService;
 import com.projectct.storageservice.util.MessageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,15 +45,16 @@ public class StorageController {
     }
 
     @GetMapping("all/{projectId}")
-    public ResponseEntity<?> getStorageMedia(@PathVariable Long projectId) {
-        var media = storageService.getStorageMedia(projectId);
+    public ResponseEntity<?> getStorageMedia(@PathVariable Long projectId, Pageable pageable) {
+        var mediaPage = storageService.getStorageMedia(projectId, pageable);
         var respondData = RespondData
                 .builder()
                 .status(HttpStatus.OK.value())
-                .data(media)
+                .data(mediaPage)
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
+
 
     @PatchMapping("{mediaId}")
     public ResponseEntity<?> updateMediaInfo(@PathVariable Long mediaId, @RequestBody MediaRequest request) {

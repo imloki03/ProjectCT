@@ -9,6 +9,7 @@ import com.projectct.messageservice.util.MessageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,10 +25,9 @@ public class ChatboxController {
 
     @GetMapping("p/{projectId}")
     public ResponseEntity<?> getMessagesByProject(
-                            @PathVariable Long projectId,
-                            @RequestParam(value = "page", defaultValue = "0") int page,
-                            @RequestParam(value = "size", defaultValue = "10") int size) {
-        Page<MessageResponse> messages = chatboxService.getMessagesByProject(projectId, page, size);
+                            @RequestParam(required = false, defaultValue = "0") Long last,
+                            @PathVariable Long projectId, Pageable pageable) {
+        Page<MessageResponse> messages = chatboxService.getMessagesByProject(projectId, last, pageable);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .data(messages)
