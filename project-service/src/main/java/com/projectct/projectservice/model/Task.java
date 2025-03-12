@@ -37,7 +37,7 @@ public class Task {
     @Column(updatable = false)
     private LocalDateTime createdDate;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private Priority priority;
 
     @OneToMany(mappedBy = "parentTask", orphanRemoval = true)
@@ -49,7 +49,7 @@ public class Task {
 
     private Long assigneeId;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private Status status;
 
     @ElementCollection

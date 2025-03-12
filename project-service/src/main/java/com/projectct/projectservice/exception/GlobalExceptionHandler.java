@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleAppException(AppException e) {
         var error = RespondData.builder()
                 .status(e.getStatus().value())
-                .desc(MessageUtil.getMessage(e.getMessage()))
+                .desc(e.getMessage())
                 .build();
         return new ResponseEntity<>(error, e.getStatus());
     }

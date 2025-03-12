@@ -9,4 +9,8 @@ public interface CollaboratorRepository extends JpaRepository<Collaborator, Long
     Collaborator findByProjectIdAndUserId(Long projectId, Long userId);
 
     List<Collaborator> findByProjectId(Long projectId);
+
+    List<Collaborator> findByUserId(Long userId);
+
+    List<Collaborator> findByUserIdAndRole_NameNot(Long userId, String name);
 }

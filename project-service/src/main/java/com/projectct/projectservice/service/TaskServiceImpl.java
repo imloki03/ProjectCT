@@ -73,7 +73,7 @@ public class TaskServiceImpl implements TaskService{
     @Override
     public PagingTaskResponse getTasksInBacklog(Long projectId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size,
-                Sort.by(Sort.Order.asc("status"), Sort.Order.desc("createdDate")));
+                Sort.by(Sort.Order.asc("priority"), Sort.Order.desc("createdDate")));
 
         Page<Task> taskPage = taskRepository.findByBacklog_Project_IdAndParentTaskIsNull(projectId, pageable);
         long totalTasks = taskRepository.countByBacklog_Project_Id(projectId);

@@ -68,6 +68,17 @@ public class CollaboratorController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
+    @GetMapping("collab/{userId}")
+    public ResponseEntity<?> getAllCollabProject(@PathVariable Long userId) {
+        var collabList = collaboratorService.getAllCollabProject(userId);
+        var respondData = RespondData
+                .builder()
+                .status(HttpStatus.OK.value())
+                .data(collabList)
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
     @PatchMapping("{collabId}")
     public ResponseEntity<?> updateCollabRole(@RequestBody CollabRoleUpdateRequest request, @PathVariable Long collabId) {
         collaboratorService.updateCollabRole(request, collabId);

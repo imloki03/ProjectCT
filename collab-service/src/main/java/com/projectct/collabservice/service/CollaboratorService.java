@@ -12,6 +12,7 @@ public interface CollaboratorService {
     void createCollab(CollabRequest collabRequest);
 
     List<CollabResponse> getAllCollabFromProject(Long projectId);
+    List<Long> getAllCollabProject(Long userId);
 
     void updateCollabRole(CollabRoleUpdateRequest request, Long collabId);
 
