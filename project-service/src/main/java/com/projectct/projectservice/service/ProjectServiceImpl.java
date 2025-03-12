@@ -12,6 +12,7 @@ import com.projectct.projectservice.model.Backlog;
 import com.projectct.projectservice.model.Project;
 import com.projectct.projectservice.repository.ProjectRepository;
 import com.projectct.projectservice.repository.httpclient.AuthClient;
+import com.projectct.projectservice.repository.httpclient.CollabClient;
 import com.projectct.projectservice.util.KafkaProducer;
 import com.projectct.projectservice.util.MessageUtil;
 import com.projectct.projectservice.util.WebUtil;
@@ -35,6 +36,8 @@ public class ProjectServiceImpl implements ProjectService{
     final ProjectRepository projectRepository;
     final ProjectMapper projectMapper;
     final KafkaProducer kafkaProducer;
+    final CollabClient collabClient;
+
     @Transactional
     @Override
     public ProjectResponse createNewProject(ProjectRequest request) {
@@ -46,7 +49,7 @@ public class ProjectServiceImpl implements ProjectService{
         Project project = Project.builder()
                 .ownerId(ownerId)
                 .ownerUsername(ownerUsername)
-                .name(request.getProjectName())
+                .name(toValidName(request.getProjectName()))
                 .description(request.getProjectDescription())
                 .build();
         Backlog backlog = Backlog
@@ -92,6 +95,10 @@ public class ProjectServiceImpl implements ProjectService{
     public List<ProjectResponse> getAllProjects() {
         Long ownerId = webUtil.getCurrentIdUser();
         List<Project> projects = projectRepository.findByOwnerId(ownerId);
+        List<Long> collabProject = collabClient.getAllCollabProject(ownerId).getData();
+        for (Long projectId : collabProject) {
+            projectRepository.findById(projectId).ifPresent(projects::add);
+        }
         return projectMapper.toProjectResponseList(projects);
     }
 
@@ -112,5 +119,11 @@ public class ProjectServiceImpl implements ProjectService{
     @Override
     public void deleteProject(Long projectId) {
         projectRepository.deleteById(projectId);
+    }
+
+    private String toValidName(String name) {
+        if (name == null || !name.matches("[a-zA-Z0-9\\s]+"))
+            throw new AppException(HttpStatus.BAD_REQUEST, MessageKey.PROJECT_NAME_INVALID);
+        return name.trim().replaceAll("\\s+", " ");
     }
 }
