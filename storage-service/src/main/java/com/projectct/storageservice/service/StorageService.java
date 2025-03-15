@@ -5,6 +5,8 @@ import com.projectct.storageservice.DTO.Media.response.MediaPagingResponse;
 import com.projectct.storageservice.DTO.Media.response.MediaResponse;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface StorageService {
     MediaResponse addMedia(Long projectId, MediaRequest request, boolean stored);
     MediaResponse getMediaInfo(Long mediaId);
