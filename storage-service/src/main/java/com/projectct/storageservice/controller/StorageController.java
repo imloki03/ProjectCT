@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("storages")
@@ -43,6 +45,18 @@ public class StorageController {
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
+
+    @GetMapping()
+    public ResponseEntity<?> getMediaList(@RequestParam List<Long> mediaIds) {
+        var medias = storageService.getMediaList(mediaIds);
+        var respondData = RespondData
+                .builder()
+                .status(HttpStatus.OK.value())
+                .data(medias)
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
 
     @GetMapping("all/{projectId}")
     public ResponseEntity<?> getStorageMedia(@PathVariable Long projectId, Pageable pageable) {

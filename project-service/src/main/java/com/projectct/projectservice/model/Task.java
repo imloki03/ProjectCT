@@ -60,7 +60,7 @@ public class Task {
     @ElementCollection
     @CollectionTable(name = "task_proof", joinColumns = @JoinColumn(name = "task_id"))
     @Column(name = "proof_id")
-    private List<Long> proofList;
+    private List<Long> proofIdList;
 
     @ManyToOne
     private Backlog backlog;

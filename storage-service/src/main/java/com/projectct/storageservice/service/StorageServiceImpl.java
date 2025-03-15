@@ -58,6 +58,13 @@ public class StorageServiceImpl implements StorageService{
     }
 
     @Override
+    public List<MediaResponse> getMediaList(List<Long> mediaIds) {
+        return mediaIds.stream()
+                .map(this::getMediaInfo)
+                .toList();
+    }
+
+    @Override
     public MediaPagingResponse getStorageMedia(Long projectId, Pageable pageable) {
         Storage storage = storageRepository.findByProjectId(projectId);
         if (storage == null)

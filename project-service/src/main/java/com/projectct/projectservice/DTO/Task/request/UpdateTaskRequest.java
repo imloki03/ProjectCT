@@ -19,5 +19,7 @@ public class UpdateTaskRequest {
     LocalDateTime startTime;
     LocalDateTime endTime;
     Priority priority;
+    Long assigneeId;
     List<Long> mediaIdList;
+    boolean removeAssignee;
 }
