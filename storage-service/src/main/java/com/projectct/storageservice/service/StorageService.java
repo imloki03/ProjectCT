@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 public interface StorageService {
     MediaResponse addMedia(Long projectId, MediaRequest request, boolean stored);
     MediaResponse getMediaInfo(Long mediaId);
+    List<MediaResponse> getMediaList(List<Long> mediaIds);
     MediaPagingResponse getStorageMedia(Long projectId, Pageable pageable);
     MediaResponse updateMediaInfo(Long mediaId, MediaRequest request);
     MediaResponse updateMediaVersion(Long mediaId, MediaRequest request);

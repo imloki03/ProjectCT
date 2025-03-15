@@ -1,5 +1,6 @@
 package com.projectct.projectservice.service;
 
+import com.projectct.projectservice.DTO.Media.response.MediaResponse;
 import com.projectct.projectservice.DTO.Task.request.TaskRequest;
 import com.projectct.projectservice.DTO.Task.request.UpdateTaskRequest;
 import com.projectct.projectservice.DTO.Task.request.UpdateTaskStatusRequest;
@@ -18,6 +19,7 @@ import com.projectct.projectservice.model.Task;
 import com.projectct.projectservice.repository.PhaseRepository;
 import com.projectct.projectservice.repository.ProjectRepository;
 import com.projectct.projectservice.repository.TaskRepository;
+import com.projectct.projectservice.repository.httpclient.MediaClient;
 import com.projectct.projectservice.util.MessageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +43,7 @@ public class TaskServiceImpl implements TaskService{
     final PhaseRepository phaseRepository;
     final ProjectRepository projectRepository;
     final TaskMapper taskMapper;
+    final MediaClient mediaClient;
     @Transactional
     @Override
     public TaskResponse createNewTask(Long projectId, TaskRequest request) {
@@ -76,7 +79,7 @@ public class TaskServiceImpl implements TaskService{
                 Sort.by(Sort.Order.asc("priority"), Sort.Order.desc("createdDate")));
 
         Page<Task> taskPage = taskRepository.findByBacklog_Project_IdAndParentTaskIsNull(projectId, pageable);
-        long totalTasks = taskRepository.countByBacklog_Project_Id(projectId);
+        long totalTasks = taskRepository.countByBacklog_Project_IdAndParentTaskNull(projectId);
 
         return PagingTaskResponse.builder()
                 .content(taskPage.getContent().stream()
@@ -87,9 +90,21 @@ public class TaskServiceImpl implements TaskService{
     }
 
     private PageableTaskResponse convertToPageableTaskResponse(Task task) {
+        TaskResponse taskResponse = taskMapper.toTaskResponse(task);
+
+        if (task.getMediaIdList() != null && !task.getMediaIdList().isEmpty()) {
+            List<MediaResponse> mediaResponses = mediaClient.getMediaList(task.getMediaIdList()).getData();
+            taskResponse.setMediaList(mediaResponses);
+        }
+
+        if (task.getProofIdList() != null && !task.getProofIdList().isEmpty()) {
+            List<MediaResponse> mediaResponses = mediaClient.getMediaList(task.getProofIdList()).getData();
+            taskResponse.setProofList(mediaResponses);
+        }
+
         return PageableTaskResponse.builder()
                 .key(task.getId())
-                .data(taskMapper.toTaskResponse(task))
+                .data(taskResponse)
                 .children(task.getSubTask().stream()
                         .map(this::convertToPageableTaskResponse)
                         .collect(Collectors.toList()))
@@ -108,7 +123,7 @@ public class TaskServiceImpl implements TaskService{
 
         Page<Task> taskPage = taskRepository.findByPhase_IdAndParentTaskIsNull(phaseId, pageable);
 
-        long totalTasks = taskRepository.countByPhase_Id(phaseId);
+        long totalTasks = taskRepository.countByPhase_IdAndParentTaskNull(phaseId);
 
         return PagingTaskResponse.builder()
                 .content(taskPage.getContent().stream()
@@ -144,6 +159,8 @@ public class TaskServiceImpl implements TaskService{
         if (task == null)
             throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.TASK_NOT_FOUND));
         taskMapper.updateTask(request, task);
+        if (request.isRemoveAssignee())
+            task.setAssigneeId(null);
         taskRepository.save(task);
         return taskMapper.toTaskResponse(task);
     }
@@ -155,11 +172,42 @@ public class TaskServiceImpl implements TaskService{
             throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.TASK_NOT_FOUND));
         task.setStatus(request.getStatus());
         if (request.getStatus() == Status.DONE)
-            task.setProofList(request.getProofList());
+            task.setProofIdList(request.getProofList());
         else
-            task.setProofList(new ArrayList<>());
+            task.setProofIdList(new ArrayList<>());
+
+        if (request.getStatus() == Status.IN_PROGRESS) {
+            if (task.getParentTask() != null)
+                updateInProgressStatusForParentTask(task.getParentTask());
+        } else if (request.getStatus() == Status.DONE) {
+            if (task.getParentTask() != null)
+                updateDoneStatusForParentTask(task);
+        }
         taskRepository.save(task);
         return taskMapper.toTaskResponse(task);
+    }
+
+    private void updateInProgressStatusForParentTask(Task task) {
+        task.setStatus(Status.IN_PROGRESS);
+        if (task.getParentTask() != null)
+            updateInProgressStatusForParentTask(task.getParentTask());
+    }
+
+    private void updateDoneStatusForParentTask(Task task) {
+        if (isAllSubTaskDone(task.getSubTask())) {
+            task.setStatus(Status.DONE);
+            if (task.getParentTask() != null)
+                updateDoneStatusForParentTask(task.getParentTask());
+        }
+    }
+
+    private boolean isAllSubTaskDone(List<Task> tasks) {
+        if (tasks == null || tasks.isEmpty())
+            return true;
+        for (Task task : tasks)
+            if (task.getStatus() != Status.DONE)
+                return false;
+        return true;
     }
 
     public int countTheSameLevelSubTask(Task task){
@@ -185,7 +233,7 @@ public class TaskServiceImpl implements TaskService{
             parentTask.setAssigneeId(collabId);
             parentTask.setStatus(Status.IN_PROGRESS);
             if (countTheSameLevelSubTask(parentTask) == 1)
-                assignToParentTask(task, collabId);
+                assignToParentTask(parentTask, collabId);
         }
     }
     public void assignAllSubTask(Task task, Long collabId) {
@@ -193,7 +241,7 @@ public class TaskServiceImpl implements TaskService{
         task.setStatus(Status.IN_PROGRESS);
         if (task.getSubTask() != null)
             for (Task subTask : task.getSubTask())
-                assignAllSubTask(task, collabId);
+                assignAllSubTask(subTask, collabId);
     }
 
     @Transactional
@@ -210,16 +258,18 @@ public class TaskServiceImpl implements TaskService{
         if (countTheSameLevelSubTask(task) == 1)
             throw new AppException(HttpStatus.CONFLICT, MessageUtil.getMessage(MessageKey.TASK_MOVE_FAILED));
         task.setParentTask(null);
-        moveAllSubtaskToPhase(task, phase);
+        moveAllSubtaskToPhase(task, phase, request);
         taskRepository.save(task);
     }
-    public void moveAllSubtaskToPhase(Task task, Phase phase) {
+    public void moveAllSubtaskToPhase(Task task, Phase phase, UpdateTaskRequest request) {
+        task.setStartTime(request.getStartTime());
+        task.setEndTime(request.getEndTime());
         task.setPhase(phase);
         task.setBacklog(null);
         task.setStatus(Status.TODO);
         if (task.getSubTask() != null)
             for (Task subTask : task.getSubTask())
-                moveAllSubtaskToPhase(subTask, phase);
+                moveAllSubtaskToPhase(subTask, phase, request);
     }
 
     @Transactional
@@ -238,7 +288,7 @@ public class TaskServiceImpl implements TaskService{
         task.setBacklog(backlog);
         task.setPhase(null);
         task.setAssigneeId(null);
-        task.setProofList(null);
+        task.setProofIdList(null);
         if (task.getSubTask() != null)
             for (Task subTask : task.getSubTask())
                 moveAllSubtaskToBacklog(subTask);

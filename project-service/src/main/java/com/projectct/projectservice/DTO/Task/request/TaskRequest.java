@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TaskRequest {
@@ -14,4 +16,5 @@ public class TaskRequest {
     String description;
     Priority priority;
     Long parentTaskId;
+    List<Long> mediaIdList;
 }
