@@ -149,7 +149,7 @@ public class TaskServiceImpl implements TaskService{
 
     @Override
     public List<TaskResponse> getAssignedTask(Long collabId) {
-        List<Task> tasks = taskRepository.findByAssigneeId(collabId);
+        List<Task> tasks = taskRepository.findByAssigneeIdAndStatusNot(collabId, Status.DONE);
         return taskMapper.toTaskResponseList(tasks);
     }
 
@@ -159,10 +159,34 @@ public class TaskServiceImpl implements TaskService{
         if (task == null)
             throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.TASK_NOT_FOUND));
         taskMapper.updateTask(request, task);
-        if (request.isRemoveAssignee())
+        if (request.isRemoveAssignee()) {
             task.setAssigneeId(null);
-        taskRepository.save(task);
+            if (task.getParentTask() != null)
+                unAssignParentTask(task.getParentTask());
+        }
         return taskMapper.toTaskResponse(task);
+    }
+
+    private void unAssignParentTask(Task task) {
+        if (isAllSubtaskNotAssigned(task)){
+            task.setAssigneeId(null);
+            taskRepository.save(task);
+            if (task.getParentTask() != null)
+                unAssignParentTask(task.getParentTask());
+        }
+    }
+
+    private boolean isAllSubtaskNotAssigned(Task task) {
+        if (task.getSubTask() == null || task.getSubTask().isEmpty())
+            return true;
+        for (Task subTask : task.getSubTask()) {
+            if (subTask.getAssigneeId() != null) {
+                return false;
+            } else {
+                return isAllSubtaskNotAssigned(subTask);
+            }
+        }
+        return true;
     }
 
     @Override

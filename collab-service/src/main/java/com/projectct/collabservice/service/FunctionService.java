@@ -16,4 +16,7 @@ public interface FunctionService {
     List<FunctionResponse> getAllFunctionOfRole(Long roleId);
 
     void deleteFunction(Long functionId);
+
+    List<FunctionResponse> getAllFunctionAvailable();
+
 }

@@ -19,4 +19,5 @@ public interface UserService {
     UserResponse getUserViaToken();
     List<TagResponse> getAllTags();
     void checkUserExist(String username);
+    List<UserResponse> searchUserByUsernameOrEmail(String query);
 }

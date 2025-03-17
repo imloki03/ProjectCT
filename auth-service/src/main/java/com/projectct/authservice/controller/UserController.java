@@ -133,4 +133,14 @@ public class UserController {
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
+
+    @GetMapping("search")
+    public ResponseEntity<?> searchUserByUsernameOrEmail(@RequestParam String query) {
+        var users = userService.searchUserByUsernameOrEmail(query);
+        var respondData = RespondData.builder()
+                .status(HttpStatus.OK.value())
+                .data(users)
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
 }

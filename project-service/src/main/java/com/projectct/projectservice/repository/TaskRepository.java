@@ -33,4 +33,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     long countByBacklog_Project_IdAndParentTaskNull(Long id);
 
     long countByPhase_IdAndParentTaskNull(Long id);
+
+    List<Task> findByAssigneeIdAndStatusNot(Long assigneeId, Status status);
 }
