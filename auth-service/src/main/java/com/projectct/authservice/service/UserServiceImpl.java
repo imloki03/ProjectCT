@@ -177,6 +177,15 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public List<UserResponse> searchUserByUsernameOrEmail(String query) {
+        if (query.trim().isEmpty()) {
+            return null;
+        }
+        List<User> users = userRepository.findByUsernameContainsOrEmail(query, query);
+        return userMapper.toUserResponseList(users.subList(0, Math.min(users.size(), 5)));
+    }
+
+    @Override
     public List<TagResponse> getAllTags() {
         List<Tag> tags = tagRepository.findAll();
 //        return tagMapper.toTagResponseList(tags);

@@ -9,6 +9,7 @@ import com.projectct.collabservice.mapper.RoleMapper;
 import com.projectct.collabservice.model.AppFunction;
 import com.projectct.collabservice.model.Role;
 import com.projectct.collabservice.repository.AppFunctionRepository;
+import com.projectct.collabservice.repository.CollaboratorRepository;
 import com.projectct.collabservice.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +25,14 @@ import java.util.List;
 public class RoleServiceImpl implements RoleService{
     final RoleRepository roleRepository;
     final AppFunctionRepository functionRepository;
+    final CollaboratorRepository collaboratorRepository;
     final RoleMapper roleMapper;
 
     @Override
     public RoleResponse createRole(RoleRequest request) {
+        if (roleRepository.existsByNameAndProjectId(request.getName(), request.getProjectId()))
+            throw new AppException(HttpStatus.BAD_REQUEST, MessageKey.ROLE_NAME_DUPLICATED);
+
         Role role = roleMapper.toRole(request);
         if (request.getFunctionList() != null) {
             role.setFunctionList(functionRepository.findAllById(request.getFunctionList()));
@@ -72,6 +77,10 @@ public class RoleServiceImpl implements RoleService{
         if (role == null) {
             throw new AppException(HttpStatus.NOT_FOUND, MessageKey.ROLE_NOT_FOUND);
         }
+
+        if (collaboratorRepository.existsByRole_Id(roleId))
+            throw new AppException(HttpStatus.CONFLICT, MessageKey.ROLE_IN_USE);
+
         roleRepository.deleteById(roleId);
     }
 }

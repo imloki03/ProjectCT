@@ -6,6 +6,7 @@ import com.projectct.collabservice.DTO.Collaborator.response.CollabResponse;
 import com.projectct.collabservice.DTO.Collaborator.response.CollabWithoutUserResponse;
 import com.projectct.collabservice.DTO.Notification.request.DirectNotificationRequest;
 import com.projectct.collabservice.DTO.User.response.UserResponse;
+import com.projectct.collabservice.constant.DefaultRole;
 import com.projectct.collabservice.constant.KafkaTopic;
 import com.projectct.collabservice.constant.MessageKey;
 
@@ -17,6 +18,7 @@ import com.projectct.collabservice.model.Role;
 import com.projectct.collabservice.repository.CollaboratorRepository;
 import com.projectct.collabservice.repository.RoleRepository;
 import com.projectct.collabservice.repository.httpclient.AuthClient;
+import com.projectct.collabservice.repository.httpclient.TaskClient;
 import com.projectct.collabservice.util.KafkaProducer;
 import com.projectct.collabservice.util.WebUtil;
 import jakarta.transaction.Transactional;
@@ -36,6 +38,7 @@ public class CollaboratorServiceImpl implements CollaboratorService{
     final RoleRepository roleRepository;
     final CollabMapper collabMapper;
     final AuthClient authClient;
+    final TaskClient taskClient;
     final CachedUserService cachedUserService;
     final KafkaProducer kafkaProducer;
     final WebUtil webUtil;
@@ -48,12 +51,8 @@ public class CollaboratorServiceImpl implements CollaboratorService{
         }
 
         Collaborator newCollab = collabMapper.toCollaborator(collabRequest);
-        Role role = Role.builder()
-                .name("CONTRIBUTOR")
-                .projectId(collabRequest.getProjectId())
-                .build();
-        roleRepository.save(role);
-        newCollab.setRole(role);
+        Role collabRole = roleRepository.findByProjectIdAndName(collabRequest.getProjectId(), DefaultRole.CONTRIBUTOR);
+        newCollab.setRole(collabRole);
         collaboratorRepository.save(newCollab);
     }
 
@@ -122,8 +121,10 @@ public class CollaboratorServiceImpl implements CollaboratorService{
 
     @Transactional
     @Override
-    //xóa task
     public void deleteCollaborator(Long collabId) {
+        if (!taskClient.getAssignedTask(collabId).getData().isEmpty())
+            throw new AppException(HttpStatus.BAD_REQUEST, MessageKey.COLLAB_DELETE_ASSIGNED);
+
         Collaborator collaborator = collaboratorRepository.findById(collabId).orElse(null);
         if (collaborator==null) {
             throw new AppException(HttpStatus.NOT_FOUND, MessageKey.COLLAB_NOT_FOUND);

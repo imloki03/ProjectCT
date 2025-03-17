@@ -32,7 +32,6 @@ public class CachedUserServiceImpl implements CachedUserService{
         List<Long> missingUserIds = userIds.stream()
                 .filter(id -> self.getCachedUser(id) == null)
                 .toList();
-        log.error(missingUserIds.toString());
         if (!missingUserIds.isEmpty()) {
             List<UserResponse> fetchedUsers = authClient.getUserList(missingUserIds).getData();
             fetchedUsers.forEach(self::cacheUser);

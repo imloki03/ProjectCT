@@ -2,6 +2,7 @@ package com.projectct.collabservice.service.KafkaConsumer;
 
 
 import com.projectct.collabservice.DTO.Collaborator.request.CollabRequest;
+import com.projectct.collabservice.constant.DefaultRole;
 import com.projectct.collabservice.constant.KafkaTopic;
 import com.projectct.collabservice.model.AppFunction;
 import com.projectct.collabservice.model.Collaborator;
@@ -30,15 +31,21 @@ public class ProjectConsumer {
     public void createProjectOwner(String request){
         CollabRequest collabRequest = objectMapperUtil.deserializeFromJson(request,CollabRequest.class);
         List<AppFunction> appFunction = appFunctionRepository.findAll();
-        Role role = Role.builder()
-                .name("PROJECT_OWNER")
+        Role ownerRole = Role.builder()
+                .name(DefaultRole.PROJECT_OWNER)
                 .functionList(appFunction)
                 .projectId(collabRequest.getProjectId())
                 .build();
-        roleRepository.save(role);
+        roleRepository.save(ownerRole);
         collaboratorRepository.save(Collaborator.builder()
                         .projectId(collabRequest.getProjectId())
                         .userId(collabRequest.getUserId())
-                        .role(role).build());
+                        .role(ownerRole).build());
+
+        Role collabRole = Role.builder()
+                .name(DefaultRole.CONTRIBUTOR)
+                .projectId(collabRequest.getProjectId())
+                .build();
+        roleRepository.save(collabRole);
     }
 }

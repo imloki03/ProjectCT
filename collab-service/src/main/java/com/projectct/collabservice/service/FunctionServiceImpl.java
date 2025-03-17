@@ -73,4 +73,11 @@ public class FunctionServiceImpl implements FunctionService {
         }
         appFunctionRepository.delete(function);
     }
+
+    @Override
+    public List<FunctionResponse> getAllFunctionAvailable() {
+        return functionMapper.toFunctionResponseList(
+                appFunctionRepository.findAll()
+        );
+    }
 }

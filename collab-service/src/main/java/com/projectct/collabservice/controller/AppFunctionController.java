@@ -78,4 +78,14 @@ public class AppFunctionController {
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
+
+    @GetMapping
+    public ResponseEntity<?> getAllFunctionAvailable() {
+        var functions = functionService.getAllFunctionAvailable();
+        var respondData = RespondData.builder()
+                .status(HttpStatus.OK.value())
+                .data(functions)
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
 }
