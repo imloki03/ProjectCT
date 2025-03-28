@@ -68,6 +68,16 @@ public class TaskController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
+    @GetMapping("phase/a/{projectId}")
+    public ResponseEntity<?> getAllPhaseTasks(@PathVariable Long projectId){
+        var tasks = taskService.getAllPhaseTasks(projectId);
+        var respondData = RespondData.builder()
+                .status(HttpStatus.OK.value())
+                .data(tasks)
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
     @GetMapping("stat/{projectId}")
     public ResponseEntity<?> getTaskStatistic(@PathVariable Long projectId){
         var stat = taskService.getTaskStatistic(projectId);
@@ -78,9 +88,9 @@ public class TaskController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
-    @GetMapping("assigned/{collabId}")
-    public ResponseEntity<?> getAssignedTask(@PathVariable Long collabId){
-        var tasks = taskService.getAssignedTask(collabId);
+    @GetMapping("assigned")
+    public ResponseEntity<?> getAssignedTask(){
+        var tasks = taskService.getAssignedTask();
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .data(tasks)

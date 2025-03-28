@@ -13,4 +13,7 @@ import java.util.List;
 public interface CollabClient {
     @GetMapping(value = "/collabs/collab/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     RespondData<List<Long>> getAllCollabProject(@PathVariable Long userId);
+
+    @GetMapping(value = "/collabs/cid/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    RespondData<List<Long>> getAllCollabIdList(@PathVariable Long userId);
 }

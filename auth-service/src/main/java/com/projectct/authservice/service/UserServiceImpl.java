@@ -60,6 +60,7 @@ public class UserServiceImpl implements UserService{
 
         UserStatus newUserStatus = UserStatus.builder()
                 .newUser(true)
+                .activated(false)
                 .build();
         userRepository.save(newUser);
         newUserStatus.setUser(newUser);

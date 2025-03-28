@@ -77,6 +77,14 @@ public class CollaboratorServiceImpl implements CollaboratorService{
                 .toList();
     }
 
+    @Override
+    public List<Long> getAllCollabIdList(Long userId) {
+        List<Collaborator> collaboratorList = collaboratorRepository.findByUserId(userId);
+        return collaboratorList.stream()
+                .map(Collaborator::getId)
+                .toList();
+    }
+
 
     @Override
     public CollabResponse getCollab(Long collabId) {

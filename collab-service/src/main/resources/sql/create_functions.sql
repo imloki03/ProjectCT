@@ -20,7 +20,7 @@ INSERT INTO app_function (name, endpoint, function_type) VALUES ('Update Media I
 INSERT INTO app_function (name, endpoint, function_type) VALUES ('Update Media Version', '^/storage/storages/([^/]+)$', 'STORAGE');
 INSERT INTO app_function (name, endpoint, function_type) VALUES ('Delete Media', '^/storage/storages/([^/]+)$', 'STORAGE');
 
--- AUTH related functions (roles, functions, tokens, otp, login, password, etc.)
+-- COLLABORATOR related functions
 INSERT INTO app_function (name, endpoint, function_type) VALUES ('Add Collaborator', '^/collab/collabs$', 'COLLABORATOR');
 INSERT INTO app_function (name, endpoint, function_type) VALUES ('Update Collaborator Role', '^/collab/collabs/([^/]+)$', 'COLLABORATOR');
 INSERT INTO app_function (name, endpoint, function_type) VALUES ('Remove Collaborator', '^/collab/collabs/([^/]+)$', 'COLLABORATOR');
