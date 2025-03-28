@@ -1,25 +1,109 @@
-name: projectct
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
     volumes:
-      - ./data/zookeeper:/var/lib/zookeeper
+      - zookeeper_data:/var/lib/zookeeper
     ports:
       - 2181:2181
+    networks:
+      - projectct-network
 
   kafka:
     image: confluentinc/cp-kafka:latest
+    container_name: kafka
     depends_on:
       - zookeeper
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     volumes:
-      - ./data/kafka:/var/lib/kafka/data
+      - kafka_data:/var/lib/kafka/data
     ports:
       - 9092:9092
+    networks:
+      - projectct-network
+
+  service-registry:
+    image: imloki/service-registry:latest
+    container_name: service-registry
+    ports:
+      - 8761:8761
+    networks:
+      - projectct-network
+
+  api-gateway:
+    image: imloki/api-gateway:latest
+    container_name: api-gateway
+    depends_on:
+      - service-registry
+    env_file:
+      - ./api-gateway/.env.prod
+    ports:
+      - 8888:8888
+    networks:
+      - projectct-network
+
+  auth-service:
+    image: imloki/auth-service:latest
+    container_name: auth-service
+    depends_on:
+      - service-registry
+    env_file:
+      - ./auth-service/.env.prod
+    ports:
+      - 8080:8080
+    networks:
+      - projectct-network
+
+  project-service:
+    image: imloki/project-service:latest
+    container_name: project-service
+    depends_on:
+      - service-registry
+    env_file:
+      - ./project-service/.env.prod
+    ports:
+      - 8081:8081
+    networks:
+      - projectct-network
+
+  collab-service:
+    image: imloki/collab-service:latest
+    container_name: collab-service
+    depends_on:
+      - service-registry
+    env_file:
+      - ./collab-service/.env.prod
+    ports:
+      - 8082:8082
+    networks:
+      - projectct-network
+
+  storage-service:
+    image: imloki/storage-service:latest
+    container_name: storage-service
+    depends_on:
+      - service-registry
+    env_file:
+      - ./storage-service/.env.prod
+    ports:
+      - 8085:8085
+    networks:
+      - projectct-network
+
+volumes:
+  zookeeper_data:
+  kafka_data:
+
+networks:
+  projectct-network:
+    driver: bridge

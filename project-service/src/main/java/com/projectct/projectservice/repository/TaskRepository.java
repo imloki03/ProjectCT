@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
@@ -35,4 +36,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     long countByPhase_IdAndParentTaskNull(Long id);
 
     List<Task> findByAssigneeIdAndStatusNot(Long assigneeId, Status status);
+
+    List<Task> findByAssigneeIdInAndStatusNot(Collection<Long> assigneeIds, Status status);
+
+    List<Task> findByPhase_Project_Id(Long id);
 }

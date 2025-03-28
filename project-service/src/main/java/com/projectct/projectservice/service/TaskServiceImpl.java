@@ -4,13 +4,11 @@ import com.projectct.projectservice.DTO.Media.response.MediaResponse;
 import com.projectct.projectservice.DTO.Task.request.TaskRequest;
 import com.projectct.projectservice.DTO.Task.request.UpdateTaskRequest;
 import com.projectct.projectservice.DTO.Task.request.UpdateTaskStatusRequest;
-import com.projectct.projectservice.DTO.Task.response.PageableTaskResponse;
-import com.projectct.projectservice.DTO.Task.response.PagingTaskResponse;
-import com.projectct.projectservice.DTO.Task.response.TaskResponse;
-import com.projectct.projectservice.DTO.Task.response.TaskStatistic;
+import com.projectct.projectservice.DTO.Task.response.*;
 import com.projectct.projectservice.constant.MessageKey;
 import com.projectct.projectservice.enums.Status;
 import com.projectct.projectservice.exception.AppException;
+import com.projectct.projectservice.mapper.ProjectMapper;
 import com.projectct.projectservice.mapper.TaskMapper;
 import com.projectct.projectservice.model.Backlog;
 import com.projectct.projectservice.model.Phase;
@@ -19,8 +17,11 @@ import com.projectct.projectservice.model.Task;
 import com.projectct.projectservice.repository.PhaseRepository;
 import com.projectct.projectservice.repository.ProjectRepository;
 import com.projectct.projectservice.repository.TaskRepository;
+import com.projectct.projectservice.repository.httpclient.CollabClient;
 import com.projectct.projectservice.repository.httpclient.MediaClient;
+import com.projectct.projectservice.util.JwtUtil;
 import com.projectct.projectservice.util.MessageUtil;
+import com.projectct.projectservice.util.WebUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -33,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,7 +45,10 @@ public class TaskServiceImpl implements TaskService{
     final PhaseRepository phaseRepository;
     final ProjectRepository projectRepository;
     final TaskMapper taskMapper;
+    final ProjectMapper projectMapper;
+    final CollabClient collabClient;
     final MediaClient mediaClient;
+    final WebUtil webUtil;
     @Transactional
     @Override
     public TaskResponse createNewTask(Long projectId, TaskRequest request) {
@@ -134,6 +139,12 @@ public class TaskServiceImpl implements TaskService{
     }
 
     @Override
+    public List<TaskResponse> getAllPhaseTasks(Long projectId) {
+        List<Task> tasks = taskRepository.findByPhase_Project_Id(projectId);
+        return taskMapper.toTaskResponseList(tasks);
+    }
+
+    @Override
     public TaskStatistic getTaskStatistic(Long projectId) {
         Long upcoming = (long) taskRepository.findByBacklog_Project_Id(projectId).size();
         Long completed = (long) taskRepository.findByPhase_Project_IdAndStatus(projectId, Status.DONE).size();
@@ -148,9 +159,22 @@ public class TaskServiceImpl implements TaskService{
     }
 
     @Override
-    public List<TaskResponse> getAssignedTask(Long collabId) {
-        List<Task> tasks = taskRepository.findByAssigneeIdAndStatusNot(collabId, Status.DONE);
-        return taskMapper.toTaskResponseList(tasks);
+    public List<ProjectAssignedTaskResponse> getAssignedTask() {
+        Long userId = webUtil.getCurrentIdUser();
+
+        List<Long> collabIds = collabClient.getAllCollabIdList(userId).getData();
+
+        List<Task> tasks = taskRepository.findByAssigneeIdInAndStatusNot(collabIds, Status.DONE);
+
+        Map<Project, List<Task>> projectTaskMap = tasks.stream()
+                .collect(Collectors.groupingBy(task -> task.getPhase().getProject()));
+
+        return projectTaskMap.entrySet().stream()
+                .map(entry -> ProjectAssignedTaskResponse.builder()
+                        .project(projectMapper.toProjectResponse(entry.getKey()))
+                        .taskList(taskMapper.toTaskResponseList(entry.getValue()))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -164,6 +188,7 @@ public class TaskServiceImpl implements TaskService{
             if (task.getParentTask() != null)
                 unAssignParentTask(task.getParentTask());
         }
+        taskRepository.save(task);
         return taskMapper.toTaskResponse(task);
     }
 

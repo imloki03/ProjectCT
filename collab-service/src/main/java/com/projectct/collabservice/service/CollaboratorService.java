@@ -14,6 +14,8 @@ public interface CollaboratorService {
     List<CollabResponse> getAllCollabFromProject(Long projectId);
     List<Long> getAllCollabProject(Long userId);
 
+    List<Long> getAllCollabIdList(Long userId);
+
     void updateCollabRole(CollabRoleUpdateRequest request, Long collabId);
 
     void deleteCollaborator(Long collabId);
