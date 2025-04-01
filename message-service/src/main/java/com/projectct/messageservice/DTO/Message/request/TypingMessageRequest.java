@@ -4,13 +4,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
-
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ReadMessageRequest {
-    Long projectId;
+public class TypingMessageRequest {
     String username;
+    String projectId;
     String authToken;
-    Long lastSeenMessageId;
+    Boolean isStop;
 }

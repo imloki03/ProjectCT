@@ -3,6 +3,7 @@ package com.projectct.messageservice.controller;
 import com.projectct.messageservice.DTO.Message.request.MessageRequest;
 import com.projectct.messageservice.DTO.Message.request.PinMessageRequest;
 import com.projectct.messageservice.DTO.Message.request.ReadMessageRequest;
+import com.projectct.messageservice.DTO.Message.request.TypingMessageRequest;
 import com.projectct.messageservice.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,7 @@ public class MessageController {
     }
 
     @MessageMapping("/typing")
-    public void typingMessage(MessageRequest request) {
+    public void typingMessage(TypingMessageRequest request) {
         messageService.typingMessage(request);
     }
 }
