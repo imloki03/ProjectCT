@@ -8,9 +8,6 @@ import java.util.List;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ReadMessageRequest {
-    Long projectId;
-    String username;
-    String authToken;
-    Long lastSeenMessageId;
+public class LastSeenMessageRequest {
+    List<String> userNameList;
 }

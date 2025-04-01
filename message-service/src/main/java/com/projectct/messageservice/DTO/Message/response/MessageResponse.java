@@ -21,4 +21,5 @@ public class MessageResponse {
     List<String> readerList;
     Boolean isPinned;
     MediaResponse media;
+    String fakeId;
 }
