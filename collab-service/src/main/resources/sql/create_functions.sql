@@ -19,6 +19,7 @@ INSERT INTO app_function (name, endpoint, function_type) VALUES ('Add Media', '^
 INSERT INTO app_function (name, endpoint, function_type) VALUES ('Update Media Info', '^/storage/storages/([^/]+)$', 'STORAGE');
 INSERT INTO app_function (name, endpoint, function_type) VALUES ('Update Media Version', '^/storage/storages/([^/]+)$', 'STORAGE');
 INSERT INTO app_function (name, endpoint, function_type) VALUES ('Delete Media', '^/storage/storages/([^/]+)$', 'STORAGE');
+INSERT INTO app_function (name, endpoint, function_type) VALUES ('Add Media from Chat', '^/storage/storages/media/([^/]+)/p/([^/]+)$', 'STORAGE');
 
 -- COLLABORATOR related functions
 INSERT INTO app_function (name, endpoint, function_type) VALUES ('Add Collaborator', '^/collab/collabs$', 'COLLABORATOR');

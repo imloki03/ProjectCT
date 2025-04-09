@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -27,15 +26,35 @@ public class ChatboxServiceImpl implements ChatboxService {
         final StorageClient storageClient;
 
     @Override
-    public List<MessageResponse> getPinnedMessagesByProject(Long projectId) {
-        List<Message> messages = messageRepository.findByChatbox_ProjectIdAndIsPinnedTrue(projectId);
-        return messages.stream().map(this::fetchFromClients).collect(Collectors.toList());
+    public Page<MessageResponse> getPinnedMessagesByProject(Long projectId, Pageable pageable) {
+        long totalElements = messageRepository.countByChatbox_ProjectIdAndIsPinnedTrue(projectId);
+        Page<Message> messages = messageRepository.findByChatbox_ProjectIdAndIsPinnedTrue(projectId, pageable);
+
+        List<MessageResponse> messageResponses = messages.stream()
+                .map(this::fetchFromClients)
+                .toList();
+
+        return new PageImpl<>(messageResponses, pageable, totalElements);
     }
 
     @Override
-    public List<MessageResponse> searchMessages(Long projectId, String keyword) {
-        List<Message> messages = messageRepository.findByChatbox_ProjectIdAndContentContains(projectId, keyword);
-        return messages.stream().map(this::fetchFromClients).collect(Collectors.toList());
+    public Page<MessageResponse> searchMessages(Long projectId, String keyword, String mode, Pageable pageable) {
+        Page<Message> messages;
+        long totalElements;
+
+        if ("media".equalsIgnoreCase(mode)) {
+            messages = messageRepository.findByChatbox_ProjectIdAndContentContainsAndMediaIdNotNull(projectId, keyword, pageable);
+            totalElements = messageRepository.countByChatbox_ProjectIdAndContentContainsAndMediaIdNotNull(projectId, keyword);
+        } else {
+            messages = messageRepository.findByChatbox_ProjectIdAndContentContainsAndMediaIdNull(projectId, keyword, pageable);
+            totalElements = messageRepository.countByChatbox_ProjectIdAndContentContainsAndMediaIdNull(projectId, keyword);
+        }
+
+        List<MessageResponse> messageResponses = messages.stream()
+                .map(this::fetchFromClients)
+                .toList();
+
+        return new PageImpl<>(messageResponses, pageable, totalElements);
     }
 
     @Override

@@ -15,4 +15,5 @@ public interface StorageService {
     MediaResponse updateMediaInfo(Long mediaId, MediaRequest request);
     MediaResponse updateMediaVersion(Long mediaId, MediaRequest request);
     void deleteMedia(Long mediaId);
+    void addMediaFromChatToStorage(Long projectId, Long mediaId);
 }
