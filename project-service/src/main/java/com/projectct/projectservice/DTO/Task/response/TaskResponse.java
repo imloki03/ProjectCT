@@ -26,6 +26,7 @@ public class TaskResponse {
     String description;
     LocalDateTime startTime;
     LocalDateTime endTime;
+    LocalDateTime doneTime;
     LocalDateTime createdDate;
     Priority priority;
     Status status;

@@ -32,6 +32,7 @@ public class Task {
     private String description;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private LocalDateTime doneTime;
 
     @CreationTimestamp
     @Column(updatable = false)
