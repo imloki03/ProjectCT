@@ -24,8 +24,10 @@ public class Message {
     private String content;
     private LocalDateTime sentTime;
     private boolean isPinned;
+    private boolean inStorage;
+    private LocalDateTime pinTime;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "message_reader", joinColumns = @JoinColumn(name = "message_id"))
     @Column(name = "reader_username")
     private List<String> readerList;

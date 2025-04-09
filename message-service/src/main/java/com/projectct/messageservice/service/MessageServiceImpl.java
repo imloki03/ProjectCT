@@ -1,11 +1,9 @@
 package com.projectct.messageservice.service;
 
-import com.projectct.messageservice.DTO.Message.request.MessageRequest;
-import com.projectct.messageservice.DTO.Message.request.PinMessageRequest;
-import com.projectct.messageservice.DTO.Message.request.ReadMessageRequest;
-import com.projectct.messageservice.DTO.Message.request.TypingMessageRequest;
+import com.projectct.messageservice.DTO.Message.request.*;
 import com.projectct.messageservice.DTO.Message.response.LastSeenMessageResponse;
 import com.projectct.messageservice.DTO.Message.response.MessageResponse;
+import com.projectct.messageservice.DTO.Message.response.StoreMediaMessageResponse;
 import com.projectct.messageservice.DTO.Message.response.TypingResponse;
 import com.projectct.messageservice.mapper.MessageMapper;
 import com.projectct.messageservice.model.Message;
@@ -51,14 +49,14 @@ public class MessageServiceImpl implements MessageService {
         Message message = messageRepository.findById(request.getPinMessageId()).orElse(null);
         if (message != null) {
             message.setPinned(!message.isPinned());
+            message.setPinTime(LocalDateTime.now());
             messageRepository.save(message);
             MessageResponse messageResponse = fetchFromClients(message, request.getAuthToken());
-            messagingTemplate.convertAndSend("/public/project/" + request.getProjectId(), messageResponse);
+            messagingTemplate.convertAndSend("/public/project/" + request.getProjectId() + "/pin", messageResponse);
         }
     }
 
     @Override
-    @Transactional
     public void readMessage(ReadMessageRequest request) {
         Map<Long, List<String>> lastSeenMessageMap = new HashMap<>();
         String username = request.getUsername();
@@ -86,6 +84,22 @@ public class MessageServiceImpl implements MessageService {
         messagingTemplate.convertAndSend("/public/project/" + request.getProjectId() + "/typing", response);
     }
 
+    @Override
+    public void storeMediaMessage(StoreMediaMessageRequest request) {
+        FeignRequestContextUtil.setAuthToken(request.getAuthToken());
+        StoreMediaMessageResponse response = StoreMediaMessageResponse.builder()
+                                            .mediaMessageId(request.getMediaMessageId())
+                                            .success(storageClient.addMediaFromChatToStorage(request.getProjectId(), request.getMediaId()).getStatus() == 200)
+                                            .build();
+        if (response.getSuccess()) {
+            Message message = messageRepository.findById(request.getMediaMessageId()).orElse(null);
+            Objects.requireNonNull(message).setInStorage(response.getSuccess());
+            messageRepository.save(message);
+        }
+        FeignRequestContextUtil.clear();
+        messagingTemplate.convertAndSend("/public/project/" + request.getProjectId() + "/storage", response);
+    }
+
     private MessageResponse fetchFromClients(Message message, String authToken) {
         FeignRequestContextUtil.setAuthToken(authToken);
 
@@ -98,5 +112,4 @@ public class MessageServiceImpl implements MessageService {
         FeignRequestContextUtil.clear();
         return response;
     }
-
 }

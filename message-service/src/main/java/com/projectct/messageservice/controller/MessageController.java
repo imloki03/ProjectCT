@@ -1,9 +1,6 @@
 package com.projectct.messageservice.controller;
 
-import com.projectct.messageservice.DTO.Message.request.MessageRequest;
-import com.projectct.messageservice.DTO.Message.request.PinMessageRequest;
-import com.projectct.messageservice.DTO.Message.request.ReadMessageRequest;
-import com.projectct.messageservice.DTO.Message.request.TypingMessageRequest;
+import com.projectct.messageservice.DTO.Message.request.*;
 import com.projectct.messageservice.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +15,6 @@ import java.util.Locale;
 
 @Slf4j
 @RestController
-@RequestMapping("messages")
 @RequiredArgsConstructor
 public class MessageController {
     final MessageService messageService;
@@ -41,4 +37,7 @@ public class MessageController {
     public void typingMessage(TypingMessageRequest request) {
         messageService.typingMessage(request);
     }
+
+    @MessageMapping("/storage")
+    public void storeMediaMessage(StoreMediaMessageRequest request) {messageService.storeMediaMessage(request);}
 }

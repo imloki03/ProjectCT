@@ -12,28 +12,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class OtpServiceImpl implements OtpService{
     final KafkaProducer kafkaProducer;
-
-    private final Map<String, String> otpStorage = new HashMap<>();  //use redis instead map
-    @Override
-    public String generateOtp(String email) {
-        String otp = String.format("%06d", new Random().nextInt(999999));
-        otpStorage.put(email, otp);
-        return otp;
-    }
+    final OtpCachedServiceImpl otpCachedService;
 
     @Override
     public void sendOtp(String email) {
-        String otp = generateOtp(email);
+        String otp = otpCachedService.getOtp(email);
+        if (Optional.ofNullable(otp).isPresent()) {
+           otpCachedService.clearOtp(email);
+           otp = otpCachedService.getOtp(email);
+        }
         String subject = "OTP Verification";
         kafkaProducer.sendMessage(KafkaTopic.SEND_EMAIL , EmailRequest.builder()
                         .receiver(email)
@@ -45,10 +39,9 @@ public class OtpServiceImpl implements OtpService{
 
     @Override
     public void verifyOTP(String email, String otp) {
-        String storedOtp = otpStorage.get(email);
-        log.error(otpStorage.toString());
+        String storedOtp = otpCachedService.getOtp(email);
         if (storedOtp != null && storedOtp.equals(otp)) {
-            otpStorage.remove(email);
+            otpCachedService.clearOtp(email);
             return;
         }
         throw new AppException(HttpStatus.BAD_REQUEST, MessageKey.OTP_INVALID);

@@ -1,9 +1,6 @@
 package com.projectct.messageservice.service;
 
-import com.projectct.messageservice.DTO.Message.request.MessageRequest;
-import com.projectct.messageservice.DTO.Message.request.PinMessageRequest;
-import com.projectct.messageservice.DTO.Message.request.ReadMessageRequest;
-import com.projectct.messageservice.DTO.Message.request.TypingMessageRequest;
+import com.projectct.messageservice.DTO.Message.request.*;
 
 public interface MessageService {
     void sendMessage(MessageRequest request);
@@ -13,4 +10,6 @@ public interface MessageService {
     void readMessage(ReadMessageRequest request);
 
     void typingMessage(TypingMessageRequest request);
+
+    void storeMediaMessage(StoreMediaMessageRequest request);
 }

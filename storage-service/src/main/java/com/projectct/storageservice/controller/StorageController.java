@@ -35,6 +35,16 @@ public class StorageController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
+    @PostMapping("media/{mediaId}/p/{projectId}")
+    public ResponseEntity<?> addMediaFromChatToStorage(@PathVariable Long projectId, @PathVariable Long mediaId){
+        storageService.addMediaFromChatToStorage(projectId, mediaId);
+        var respondData = RespondData
+                .builder()
+                .status(HttpStatus.OK.value())
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
     @GetMapping("{mediaId}")
     public ResponseEntity<?> getMediaInfo(@PathVariable Long mediaId) {
         var media = storageService.getMediaInfo(mediaId);

@@ -85,9 +85,9 @@ public class ChatboxController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
-    @GetMapping("pin/p/{projectId}")
-    public ResponseEntity<?> getPinnedMessagesByProject(@PathVariable Long projectId) {
-        List<MessageResponse> messages = chatboxService.getPinnedMessagesByProject(projectId);
+    @GetMapping("p/{projectId}/pin")
+    public ResponseEntity<?> getPinnedMessagesByProject(@PathVariable Long projectId, Pageable pageable) {
+        Page<MessageResponse> messages = chatboxService.getPinnedMessagesByProject(projectId, pageable);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .data(messages) // Include pagination metadata if needed
@@ -96,8 +96,8 @@ public class ChatboxController {
     }
 
     @GetMapping("search/p/{projectId}")
-    public ResponseEntity<?> searchMessages(@PathVariable Long projectId, @RequestParam String keyword) {
-        List<MessageResponse> messages = chatboxService.searchMessages(projectId, keyword);
+    public ResponseEntity<?> searchMessages(@PathVariable Long projectId, @RequestParam String keyword, @RequestParam String mode, Pageable pageable) {
+        Page<MessageResponse> messages = chatboxService.searchMessages(projectId, keyword, mode, pageable);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .data(messages)

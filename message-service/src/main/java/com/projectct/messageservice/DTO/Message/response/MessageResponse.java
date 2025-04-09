@@ -18,8 +18,10 @@ public class MessageResponse {
     String content;
     String project;
     LocalDateTime sentTime;
+    LocalDateTime pinTime;
     List<String> readerList;
     Boolean isPinned;
+    Boolean inStorage;
     MediaResponse media;
     String fakeId;
 }

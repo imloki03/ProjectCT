@@ -140,6 +140,20 @@ public class StorageServiceImpl implements StorageService{
         mediaRepository.deleteById(mediaId);
     }
 
+    @Override
+    public void addMediaFromChatToStorage(Long projectId, Long mediaId) {
+        Media currentMedia = mediaRepository.findById(mediaId).orElse(null);
+        if (currentMedia == null)
+            throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.MEDIA_NOT_FOUND));
+        Storage storage = storageRepository.findByProjectId(projectId);
+        if (storage == null)
+            throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.STORAGE_NOT_FOUND));
+        storage.addMedia(currentMedia);
+        currentMedia.setStorage(storage);
+        storageRepository.save(storage);
+        mediaRepository.save(currentMedia);
+    }
+
     public MediaType convertFilenameToMediaType(String filename) {
         String extension = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
         return switch (extension) {
