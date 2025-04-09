@@ -11,6 +11,7 @@ import lombok.experimental.FieldDefaults;
 public class TaskStatistic {
     Long totalTask;
     Long upcoming; //tasks in backlog
-    Long inProgress; //tasks haven't done in phases
+    Long toDo; //task has to do status
+    Long inProgress; //task has in progress status
     Long completed; //task has done status
 }

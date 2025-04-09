@@ -16,6 +16,7 @@ public class MessageKey {
     public static final String TASK_MOVE_FAILED = "task.move.failed";
     public static final String TASK_UPDATE_SUCCESS = "task.update.success";
     public static final String TASK_UPDATE_STATUS_SUCCESS = "task.update.status.success";
+    public static final String TASK_UPDATE_TIME = "task.update.time";
     public static final String TASK_ASSIGN_SUCCESS = "task.assign.success";
     public static final String TASK_MOVE_PHASE_SUCCESS = "task.move.phase.success";
     public static final String TASK_MOVE_BACKLOG_SUCCESS = "task.move.backlog.success";

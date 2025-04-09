@@ -32,6 +32,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -149,10 +150,12 @@ public class TaskServiceImpl implements TaskService{
         Long upcoming = (long) taskRepository.findByBacklog_Project_Id(projectId).size();
         Long completed = (long) taskRepository.findByPhase_Project_IdAndStatus(projectId, Status.DONE).size();
         Long total = (long) taskRepository.findByBacklog_Project_IdOrPhase_Project_Id(projectId, projectId).size();
-        Long inProgress = total - completed - upcoming;
+        Long inProgress = (long) taskRepository.findByPhase_Project_IdAndStatus(projectId, Status.IN_PROGRESS).size();
+        Long toDo = (long) taskRepository.findByPhase_Project_IdAndStatus(projectId, Status.TODO).size();
         return TaskStatistic.builder()
                 .totalTask(total)
                 .upcoming(upcoming)
+                .toDo(toDo)
                 .inProgress(inProgress)
                 .completed(completed)
                 .build();
@@ -182,6 +185,14 @@ public class TaskServiceImpl implements TaskService{
         Task task = taskRepository.findById(taskId).orElse(null);
         if (task == null)
             throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.TASK_NOT_FOUND));
+
+        if (task.getPhase() != null) {
+            Phase phase = task.getPhase();
+            if (phase.getStartDate().isAfter(request.getStartTime().toLocalDate())
+                    || phase.getEndDate().isBefore(request.getEndTime().toLocalDate()))
+                throw new AppException(HttpStatus.BAD_REQUEST, MessageUtil.getMessage(MessageKey.TASK_UPDATE_TIME));
+        }
+
         taskMapper.updateTask(request, task);
         if (request.isRemoveAssignee()) {
             task.setAssigneeId(null);
@@ -220,8 +231,10 @@ public class TaskServiceImpl implements TaskService{
         if (task == null)
             throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.TASK_NOT_FOUND));
         task.setStatus(request.getStatus());
-        if (request.getStatus() == Status.DONE)
+        if (request.getStatus() == Status.DONE) {
+            task.setDoneTime(LocalDateTime.now());
             task.setProofIdList(request.getProofList());
+        }
         else
             task.setProofIdList(new ArrayList<>());
 
@@ -301,6 +314,9 @@ public class TaskServiceImpl implements TaskService{
         Phase phase = phaseRepository.findById(phaseId).orElse(null);
         if (phase == null)
             throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.PHASE_NOT_FOUND));
+        if (phase.getStartDate().isAfter(request.getStartTime().toLocalDate())
+                || phase.getEndDate().isBefore(request.getEndTime().toLocalDate()))
+            throw new AppException(HttpStatus.BAD_REQUEST, MessageUtil.getMessage(MessageKey.TASK_UPDATE_TIME));
         Task task = taskRepository.findById(taskId).orElse(null);
         if (task == null)
             throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.TASK_NOT_FOUND));
