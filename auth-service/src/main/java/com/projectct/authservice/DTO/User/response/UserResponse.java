@@ -22,4 +22,6 @@ public class UserResponse {
     String fcmToken;
     List<TagResponse> tagList;
     UserStatusResponse status;
+    String githubId;
+    Boolean isGoogleAccount;
 }

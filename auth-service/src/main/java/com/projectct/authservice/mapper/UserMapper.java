@@ -3,6 +3,7 @@ package com.projectct.authservice.mapper;
 import com.projectct.authservice.DTO.Tag.response.TagResponse;
 import com.projectct.authservice.DTO.User.request.EditProfileRequest;
 import com.projectct.authservice.DTO.User.request.RegisterRequest;
+import com.projectct.authservice.DTO.User.request.UpdateOAuthUserRequest;
 import com.projectct.authservice.DTO.User.response.UserResponse;
 import com.projectct.authservice.DTO.UserStatus.response.UserStatusResponse;
 import com.projectct.authservice.model.User;
@@ -21,4 +22,8 @@ public interface UserMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "tagList", ignore = true)
     void toUpdateUser(EditProfileRequest request, @MappingTarget User user);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "tagList", ignore = true)
+    void toUpdateOauthUser(UpdateOAuthUserRequest request, @MappingTarget User user);
 }
