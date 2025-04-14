@@ -186,6 +186,32 @@ public class UserServiceImpl implements UserService{
         return userMapper.toUserResponseList(users.subList(0, Math.min(users.size(), 5)));
     }
 
+    @Transactional
+    @Override
+    public UserResponse updateOauthUser(UpdateOAuthUserRequest request) {
+        if (request.getEmail()!=null && userRepository.existsByEmail(request.getEmail()))
+            throw new AppException(HttpStatus.CONFLICT, MessageKey.EMAIL_ALREADY_EXISTS);
+        if (userRepository.existsByUsername(request.getUsername()))
+            throw new AppException(HttpStatus.CONFLICT, MessageKey.USERNAME_ALREADY_EXISTS);
+
+        Long id = webUtil.getCurrentIdUser();
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
+        }
+
+        userMapper.toUpdateOauthUser(request, user);
+
+        UserStatus status = user.getStatus();
+        if (request.getUsername() != null) {
+            status.setActivated(true);
+            userStatusRepository.save(status);
+        }
+
+        userRepository.save(user);
+        return userMapper.toUserResponse(user);
+    }
+
     @Override
     public List<TagResponse> getAllTags() {
         List<Tag> tags = tagRepository.findAll();

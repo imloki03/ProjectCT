@@ -20,4 +20,5 @@ public interface UserService {
     List<TagResponse> getAllTags();
     void checkUserExist(String username);
     List<UserResponse> searchUserByUsernameOrEmail(String query);
+    UserResponse updateOauthUser(UpdateOAuthUserRequest request);
 }

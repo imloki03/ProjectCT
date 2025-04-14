@@ -37,7 +37,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "PATCH:/auth/users/exist",
             "POST:/auth/otp/**",
             "POST:/auth/otp/verify/**/**",
-            "POST:/auth/jwt/refresh"
+            "POST:/auth/jwt/refresh",
+            "GET:/oauth2/**",
+            "GET:/login/**"
     );
 
     @Override

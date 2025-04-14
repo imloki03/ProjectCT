@@ -143,4 +143,15 @@ public class UserController {
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
+
+    @PutMapping("oauth")
+    public ResponseEntity<?> updateOauthUser(@RequestBody UpdateOAuthUserRequest request) {
+        UserResponse res = userService.updateOauthUser(request);
+        var respondData = RespondData.builder()
+                .status(HttpStatus.OK.value())
+                .desc(MessageUtil.getMessage(MessageKey.EDIT_PROFILE_SUCCESS))
+                .data(res)
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
 }

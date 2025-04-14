@@ -14,6 +14,13 @@ spring:
           filters:
             - StripPrefix=1 # Remove /auth before route request
 
+        - id: auth-service-oauth2
+          uri: lb://auth-service
+          predicates:
+            - Path=/oauth2/**, /login/**
+          filters:
+            - StripPrefix=0
+
         - id: project-service
           uri: lb://project-service
           predicates:

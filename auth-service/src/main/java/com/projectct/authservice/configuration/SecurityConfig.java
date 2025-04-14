@@ -1,5 +1,6 @@
 package com.projectct.authservice.configuration;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,9 +24,12 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
     @Value("${jwt.secret_key}")
     private String SECRET_KEY;
+
+    final CustomOAuth2SuccessHandler successHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -39,6 +43,10 @@ public class SecurityConfig {
                 );
 
         http.csrf(AbstractHttpConfigurer::disable);
+
+        http.oauth2Login(oauth -> oauth
+                        .successHandler(successHandler)
+                );
         return http.build();
     }
 

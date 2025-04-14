@@ -20,12 +20,14 @@ public class User {
     @Column(name = "username", unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
     private String username;
     private String name;
-    @Column(name = "email", unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
+//    @Column(name = "email", unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
     private String email;
     private String password;
     private String gender;
     private String avatarURL;
     private String fcmToken;
+    private String githubId;
+    private Boolean isGoogleAccount;
 
     @ManyToMany
     @JoinTable(
