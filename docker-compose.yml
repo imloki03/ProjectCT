@@ -100,6 +100,30 @@ services:
     networks:
       - projectct-network
 
+  message-service:
+    image: phancongdocker/message-service:latest
+    container_name: message-service
+    depends_on:
+      - service-registry
+    env_file:
+      - ./message-service/.env.prod
+    ports:
+      - 8083:8083
+    networks:
+      - projectct-network
+
+  notification-service:
+    image: phancongdocker/notification-service:latest
+    container_name: notification-service
+    depends_on:
+      - service-registry
+    env_file:
+      - ./notification-service/.env.prod
+    ports:
+      - 8084:8084
+    networks:
+      - projectct-network
+
 volumes:
   zookeeper_data:
   kafka_data:
