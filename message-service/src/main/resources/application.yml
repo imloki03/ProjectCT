@@ -40,3 +40,10 @@ gemini:
   api:
     key: ${GEMINI_API_KEY}
     url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=
+
+
+logging:
+  level:
+    org.springframework.web.socket: TRACE
+    org.springframework.web.reactive.socket: TRACE
+    org.springframework.web.servlet.mvc.method: TRACE

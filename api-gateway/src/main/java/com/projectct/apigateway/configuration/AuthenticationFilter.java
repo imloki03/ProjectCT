@@ -21,6 +21,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -44,7 +45,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        log.info("Start global filter...");
+        log.info(new Date() + " : Start global filter - "+ exchange.getRequest().getURI());
 
         if ("websocket".equalsIgnoreCase(exchange.getRequest().getHeaders().getUpgrade())) {
             log.info("WebSocket request detected, bypassing authentication filter.");
