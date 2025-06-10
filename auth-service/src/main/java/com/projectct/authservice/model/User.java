@@ -3,6 +3,7 @@ package com.projectct.authservice.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -25,7 +26,10 @@ public class User {
     private String password;
     private String gender;
     private String avatarURL;
-    private String fcmToken;
+
+    @ElementCollection
+    private List<String> fcmTokens = new ArrayList<>();
+
     private String githubId;
     private Boolean isGoogleAccount;
 

@@ -8,7 +8,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TypingMessageRequest {
     String username;
-    String projectId;
+    Long projectId;
     String authToken;
+    Long taskId;
     Boolean isStop;
 }

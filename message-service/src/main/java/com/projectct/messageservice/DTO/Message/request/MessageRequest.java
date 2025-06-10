@@ -12,4 +12,5 @@ public class MessageRequest {
      String content;
      Long mediaId;
      String authToken;
+     Long taskId;
 }

@@ -19,7 +19,7 @@ public class UserResponse {
     String email;
     String gender;
     String avatarURL;
-    String fcmToken;
+    List<String> fcmTokens;
     List<TagResponse> tagList;
     UserStatusResponse status;
     String githubId;

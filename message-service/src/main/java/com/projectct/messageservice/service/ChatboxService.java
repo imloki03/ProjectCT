@@ -9,17 +9,17 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface ChatboxService {
-    Page<MessageResponse> getPinnedMessagesByProject(Long projectId, Pageable pageable);
+    Page<MessageResponse> getOlderMessageByProject(Long projectId, Long lastMessageId, Long taskId, Pageable pageable);
 
-    Page<MessageResponse> searchMessages(Long projectId, String keyword, String mode, Pageable pageable);
+    Page<MessageResponse> getNewerMessageByProject(Long projectId, Long lastMessageId, Long taskId, Pageable pageable);
 
-    Page<MessageResponse> getOlderMessageByProject(Long projectId, Long lastMessageId, Pageable pageable);
+    Page<MessageResponse> getMediaMessageByProject(Long projectId, Long taskId, Pageable pageable);
 
-    Page<MessageResponse> getMediaMessageByProject(Long projectId, Pageable pageable);
+    MessageSourceResponse getSourceMessage(Long projectId, Long messageId, Long taskId, Pageable pageable);
 
-    MessageSourceResponse getSourceMessage(Long projectId, Long messageId, Pageable pageable);
+    LastSeenMessageResponse getLastSeenMessageByProject(List<String> usernameList, Long projectId, Long taskId);
 
-    Page<MessageResponse> getNewerMessageByProject(Long projectId, Long last, Pageable pageable);
+    Page<MessageResponse> getPinnedMessagesByProject(Long projectId, Long taskId, Pageable pageable);
 
-    LastSeenMessageResponse getLastSeenMessageByProject(List<String> usernameList, Long projectId);
+    Page<MessageResponse> searchMessages(Long projectId, String keyword, String mode, Long taskId, Pageable pageable);
 }

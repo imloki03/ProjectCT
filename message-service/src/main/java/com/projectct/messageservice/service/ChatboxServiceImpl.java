@@ -20,34 +20,22 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class ChatboxServiceImpl implements ChatboxService {
-        final MessageRepository messageRepository;
-        final MessageMapper messageMapper;
-        final AuthClient authClient;
-        final StorageClient storageClient;
+    final MessageRepository messageRepository;
+    final MessageMapper messageMapper;
+    final AuthClient authClient;
+    final StorageClient storageClient;
 
     @Override
-    public Page<MessageResponse> getPinnedMessagesByProject(Long projectId, Pageable pageable) {
-        long totalElements = messageRepository.countByChatbox_ProjectIdAndIsPinnedTrue(projectId);
-        Page<Message> messages = messageRepository.findByChatbox_ProjectIdAndIsPinnedTrue(projectId, pageable);
-
-        List<MessageResponse> messageResponses = messages.stream()
-                .map(this::fetchFromClients)
-                .toList();
-
-        return new PageImpl<>(messageResponses, pageable, totalElements);
-    }
-
-    @Override
-    public Page<MessageResponse> searchMessages(Long projectId, String keyword, String mode, Pageable pageable) {
-        Page<Message> messages;
+    public Page<MessageResponse> getPinnedMessagesByProject(Long projectId, Long taskId, Pageable pageable) {
         long totalElements;
+        Page<Message> messages;
 
-        if ("media".equalsIgnoreCase(mode)) {
-            messages = messageRepository.findByChatbox_ProjectIdAndContentContainsAndMediaIdNotNull(projectId, keyword, pageable);
-            totalElements = messageRepository.countByChatbox_ProjectIdAndContentContainsAndMediaIdNotNull(projectId, keyword);
+        if (taskId != null) {
+            totalElements = messageRepository.countByChatbox_TaskIdAndIsPinnedTrue(taskId);
+            messages = messageRepository.findByChatbox_TaskIdAndIsPinnedTrue(taskId, pageable);
         } else {
-            messages = messageRepository.findByChatbox_ProjectIdAndContentContainsAndMediaIdNull(projectId, keyword, pageable);
-            totalElements = messageRepository.countByChatbox_ProjectIdAndContentContainsAndMediaIdNull(projectId, keyword);
+            totalElements = messageRepository.countByChatbox_ProjectIdAndIsPinnedTrue(projectId);
+            messages = messageRepository.findByChatbox_ProjectIdAndIsPinnedTrue(projectId, pageable);
         }
 
         List<MessageResponse> messageResponses = messages.stream()
@@ -57,9 +45,39 @@ public class ChatboxServiceImpl implements ChatboxService {
         return new PageImpl<>(messageResponses, pageable, totalElements);
     }
 
+        @Override
+        public Page<MessageResponse> searchMessages(Long projectId, String keyword, String mode, Long taskId, Pageable pageable) {
+            Page<Message> messages;
+            long totalElements;
+    
+            if ("media".equalsIgnoreCase(mode)) {
+                if (taskId != null) {
+                    messages = messageRepository.findByChatbox_TaskIdAndContentContainsAndMediaIdNotNull(taskId, keyword, pageable);
+                    totalElements = messageRepository.countByChatbox_TaskIdAndContentContainsAndMediaIdNotNull(taskId, keyword);
+                } else {
+                    messages = messageRepository.findByChatbox_ProjectIdAndContentContainsAndMediaIdNotNull(projectId, keyword, pageable);
+                    totalElements = messageRepository.countByChatbox_ProjectIdAndContentContainsAndMediaIdNotNull(projectId, keyword);
+                }
+            } else {
+                if (taskId != null) {
+                    messages = messageRepository.findByChatbox_TaskIdAndContentContainsAndMediaIdNull(taskId, keyword, pageable);
+                    totalElements = messageRepository.countByChatbox_TaskIdAndContentContainsAndMediaIdNull(taskId, keyword);
+                } else {
+                    messages = messageRepository.findByChatbox_ProjectIdAndContentContainsAndMediaIdNull(projectId, keyword, pageable);
+                    totalElements = messageRepository.countByChatbox_ProjectIdAndContentContainsAndMediaIdNull(projectId, keyword);
+                }
+            }
+    
+            List<MessageResponse> messageResponses = messages.stream()
+                    .map(this::fetchFromClients)
+                    .toList();
+    
+            return new PageImpl<>(messageResponses, pageable, totalElements);
+        }
+
     @Override
-    public Page<MessageResponse> getOlderMessageByProject(Long projectId, Long lastMessageId, Pageable pageable) {
-        LocalDateTime sentTime =  LocalDateTime.of(9999, 12, 31, 23, 59, 59);
+    public Page<MessageResponse> getOlderMessageByProject(Long projectId, Long lastMessageId, Long taskId, Pageable pageable) {
+        LocalDateTime sentTime = LocalDateTime.of(9999, 12, 31, 23, 59, 59);
 
         if (lastMessageId != 0) {
             Optional<Message> lastMessage = messageRepository.findById(lastMessageId);
@@ -68,13 +86,27 @@ public class ChatboxServiceImpl implements ChatboxService {
             }
         }
 
-        Page<Message> messages = messageRepository.findByChatbox_ProjectIdAndSentTimeLessThan(projectId, sentTime, pageable);
+        Page<Message> messages;
+        if (taskId != null) {
+            messages = messageRepository.findByChatbox_TaskIdAndSentTimeLessThan(taskId, sentTime, pageable);
+        } else {
+            messages = messageRepository.findByChatbox_ProjectIdAndSentTimeLessThan(projectId, sentTime, pageable);
+        }
+
         return messages.map(this::fetchFromClients);
     }
 
     @Override
-    public Page<MessageResponse> getNewerMessageByProject(Long projectId, Long lastMessageId, Pageable pageable) {
-        Page<Message> messages = messageRepository.findByChatbox_ProjectIdAndSentTimeGreaterThan(projectId, messageRepository.findById(lastMessageId).get().getSentTime(), pageable);
+    public Page<MessageResponse> getNewerMessageByProject(Long projectId, Long lastMessageId, Long taskId, Pageable pageable) {
+        LocalDateTime sentTime = messageRepository.findById(lastMessageId).get().getSentTime();
+
+        Page<Message> messages;
+        if (taskId != null) {
+            messages = messageRepository.findByChatbox_TaskIdAndSentTimeGreaterThan(taskId, sentTime, pageable);
+        } else {
+            messages = messageRepository.findByChatbox_ProjectIdAndSentTimeGreaterThan(projectId, sentTime, pageable);
+        }
+
         List<MessageResponse> reversedMessages = new ArrayList<>(messages.getContent().stream()
                 .map(this::fetchFromClients)
                 .toList());
@@ -83,11 +115,16 @@ public class ChatboxServiceImpl implements ChatboxService {
     }
 
     @Override
-    public LastSeenMessageResponse getLastSeenMessageByProject(List<String> usernameList, Long projectId) {
+    public LastSeenMessageResponse getLastSeenMessageByProject(List<String> usernameList, Long projectId, Long taskId) {
         Map<Long, List<String>> lastSeenMap = new HashMap<>();
 
         for (String username : usernameList) {
-            Message message = messageRepository.findFirstByChatbox_ProjectIdAndReaderListContainsOrderBySentTimeDesc(projectId, username);
+            Message message;
+            if (taskId != null) {
+                message = messageRepository.findFirstByChatbox_TaskIdAndReaderListContainsOrderBySentTimeDesc(taskId, username);
+            } else {
+                message = messageRepository.findFirstByChatbox_ProjectIdAndReaderListContainsOrderBySentTimeDesc(projectId, username);
+            }
 
             if (message != null) {
                 lastSeenMap.computeIfAbsent(message.getId(), k -> new ArrayList<>()).add(username);
@@ -96,11 +133,18 @@ public class ChatboxServiceImpl implements ChatboxService {
         return LastSeenMessageResponse.builder().lastSeenMessageMap(lastSeenMap).build();
     }
 
-
     @Override
-    public Page<MessageResponse> getMediaMessageByProject(Long projectId, Pageable pageable) {
-        long totalElements = messageRepository.countByChatbox_ProjectIdAndMediaIdNotNull(projectId);
-        Page<Message> messages = messageRepository.findByChatbox_ProjectIdAndMediaIdNotNull(projectId, pageable);
+    public Page<MessageResponse> getMediaMessageByProject(Long projectId, Long taskId, Pageable pageable) {
+        long totalElements;
+        Page<Message> messages;
+
+        if (taskId != null) {
+            totalElements = messageRepository.countByChatbox_TaskIdAndMediaIdNotNull(taskId);
+            messages = messageRepository.findByChatbox_TaskIdAndMediaIdNotNull(taskId, pageable);
+        } else {
+            totalElements = messageRepository.countByChatbox_ProjectIdAndMediaIdNotNull(projectId);
+            messages = messageRepository.findByChatbox_ProjectIdAndMediaIdNotNull(projectId, pageable);
+        }
 
         List<MessageResponse> messageResponses = messages.stream()
                 .map(this::fetchFromClients)
@@ -110,11 +154,20 @@ public class ChatboxServiceImpl implements ChatboxService {
     }
 
     @Override
-    public MessageSourceResponse getSourceMessage(Long projectId, Long messageId, Pageable pageable) {
-        Pageable ascendingSenttime = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("sentTime").ascending());
+    public MessageSourceResponse getSourceMessage(Long projectId, Long messageId, Long taskId, Pageable pageable) {
+        Pageable ascendingSentTime = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("sentTime").ascending());
+        LocalDateTime messageTime = messageRepository.findById(messageId).get().getSentTime();
 
-        Page<Message> olderMessages = messageRepository.findByChatbox_ProjectIdAndSentTimeLessThan(projectId, messageRepository.findById(messageId).get().getSentTime(), pageable);
-        Page<Message> newerMessages = messageRepository.findByChatbox_ProjectIdAndSentTimeGreaterThan(projectId, messageRepository.findById(messageId).get().getSentTime(), ascendingSenttime);
+        Page<Message> olderMessages;
+        Page<Message> newerMessages;
+
+        if (taskId != null) {
+            olderMessages = messageRepository.findByChatbox_TaskIdAndSentTimeLessThan(taskId, messageTime, pageable);
+            newerMessages = messageRepository.findByChatbox_TaskIdAndSentTimeGreaterThan(taskId, messageTime, ascendingSentTime);
+        } else {
+            olderMessages = messageRepository.findByChatbox_ProjectIdAndSentTimeLessThan(projectId, messageTime, pageable);
+            newerMessages = messageRepository.findByChatbox_ProjectIdAndSentTimeGreaterThan(projectId, messageTime, ascendingSentTime);
+        }
 
         List<MessageResponse> olderResponses = olderMessages.getContent().stream()
                 .map(this::fetchFromClients)
@@ -137,7 +190,6 @@ public class ChatboxServiceImpl implements ChatboxService {
                 .build();
     }
 
-    //cải tiến
     private MessageResponse fetchFromClients(Message message) {
         MessageResponse response = messageMapper.toMessageResponse(message);
         response.setSender(authClient.getUserInfo(message.getSenderId()).getData());
@@ -147,4 +199,3 @@ public class ChatboxServiceImpl implements ChatboxService {
         return response;
     }
 }
-

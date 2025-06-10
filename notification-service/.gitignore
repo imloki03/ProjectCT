@@ -37,3 +37,7 @@ out/
 .vscode/
 /.env
 /.env.prod
+/.env.prod
+
+### Firebase Key ###
+/src/main/resources/firebaseKey.json

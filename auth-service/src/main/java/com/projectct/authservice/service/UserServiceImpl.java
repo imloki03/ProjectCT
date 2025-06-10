@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -121,6 +122,16 @@ public class UserServiceImpl implements UserService{
         if (request.getTagList() != null && !request.getTagList().isEmpty()) {
             user.setTagList(tagRepository.findAllById(request.getTagList()));
         }
+
+        Optional.ofNullable(request.getFcmToken()).ifPresent(token -> {
+            if (user.getFcmTokens().contains(token)) {
+                user.getFcmTokens().remove(token);
+            }
+            else {
+                user.getFcmTokens().add(token);
+            }
+        });
+
         userRepository.save(user);
         userCachedService.updateUser(user);
 //      #Collab cache
@@ -137,19 +148,20 @@ public class UserServiceImpl implements UserService{
             throw new AppException(HttpStatus.NOT_FOUND, MessageKey.USER_NOT_FOUND);
         }
 
-        if (!user.getStatus().isActivated())
-            user.setStatus(UserStatus.builder().
-                        activated(request.isActive()).
-                        build());
+        UserStatus status = user.getStatus();
 
-        if (user.getStatus().isNewUser())
-            user.setStatus(UserStatus.builder().
-                        newUser(request.isNew())
-                        .build());
+        if (!status.isActivated()) {
+            status.setActivated(request.isActive());
+        }
+
+        if (status.isNewUser()) {
+            status.setNewUser(request.isNew());
+        }
 
         userRepository.save(user);
         userCachedService.updateUser(user);
     }
+
 
     @Override
     public UserResponse getUserInfoById(Long userId) {

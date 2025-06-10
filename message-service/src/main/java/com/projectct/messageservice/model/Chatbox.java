@@ -20,4 +20,6 @@ public class Chatbox {
     private List<Message> messageList;
 
     private Long projectId;
+
+    private Long taskId;
 }

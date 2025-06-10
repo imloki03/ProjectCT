@@ -10,8 +10,11 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class NotificationResponse {
     Long id;
+    String title;
     String content;
     LocalDateTime sentTime;
     Boolean isRead;
     String referenceLink;
+    String relevantName;
+    String relevantAvatarUrl;
 }

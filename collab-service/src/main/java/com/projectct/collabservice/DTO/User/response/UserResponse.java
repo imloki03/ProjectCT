@@ -3,11 +3,12 @@ package com.projectct.collabservice.DTO.User.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
     Long id;
@@ -16,5 +17,7 @@ public class UserResponse {
     String email;
     String gender;
     String avatarURL;
-    String fcmToken;
+    List<String> fcmTokens;
+    String githubId;
+    Boolean isGoogleAccount;
 }
