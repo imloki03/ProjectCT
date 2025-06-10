@@ -96,7 +96,7 @@ public class UserController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
-    @PatchMapping("status")
+    @PutMapping("status")
     public ResponseEntity<?> updateUserStatus(@RequestBody UpdateStatusRequest request) {
         userService.updateUserStatus(request);
         var respondData = RespondData.builder()

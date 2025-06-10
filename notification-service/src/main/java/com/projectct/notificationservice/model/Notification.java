@@ -18,10 +18,17 @@ public class Notification {
     private Long id;
 
     private Long recipientId;
-    private String content;
+    private String titleKey;
+    private String messageKey;
+
+    @Column(columnDefinition = "TEXT")
+    private String argsJson;
+
     private LocalDateTime sentTime;
     private boolean isRead;
     private String referenceLink;
+    private String relevantName;
+    private String relevantAvatarUrl;
 
     @ManyToOne
     @JoinColumn(name = "notiqueue_id")

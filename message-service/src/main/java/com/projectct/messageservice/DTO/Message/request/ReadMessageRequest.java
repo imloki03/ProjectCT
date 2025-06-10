@@ -13,4 +13,5 @@ public class ReadMessageRequest {
     String username;
     String authToken;
     Long lastSeenMessageId;
+    Long taskId;
 }

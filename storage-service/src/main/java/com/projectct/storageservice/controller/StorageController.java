@@ -7,6 +7,7 @@ import com.projectct.storageservice.service.StorageService;
 import com.projectct.storageservice.util.MessageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -111,6 +112,17 @@ public class StorageController {
                 .builder()
                 .status(HttpStatus.OK.value())
                 .desc(MessageUtil.getMessage(MessageKey.MEDIA_DELETE_SUCCESS))
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
+    @GetMapping("search/p/{projectId}")
+    public ResponseEntity<?> searchMedia(@PathVariable Long projectId, @RequestParam String keyword, Pageable pageable) {
+        var mediaPage = storageService.searchMedia(projectId, keyword, pageable);
+        var respondData = RespondData
+                .builder()
+                .status(HttpStatus.OK.value())
+                .data(mediaPage)
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }

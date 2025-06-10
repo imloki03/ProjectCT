@@ -6,6 +6,7 @@ import com.projectct.messageservice.DTO.Message.response.MessageResponse;
 import com.projectct.messageservice.DTO.Message.response.StoreMediaMessageResponse;
 import com.projectct.messageservice.DTO.Message.response.TypingResponse;
 import com.projectct.messageservice.mapper.MessageMapper;
+import com.projectct.messageservice.model.Chatbox;
 import com.projectct.messageservice.model.Message;
 import com.projectct.messageservice.repository.ChatboxRepository;
 import com.projectct.messageservice.repository.MessageRepository;
@@ -35,14 +36,33 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void sendMessage(MessageRequest request) {
         Long projectId = request.getProjectId();
+        Long taskId = request.getTaskId();
+
         Message message = messageMapper.toMessage(request);
         message.setSentTime(LocalDateTime.now());
-        message.setChatbox(chatboxRepository.findByProjectId(projectId));
+
+        Chatbox chatbox;
+        if (taskId != null) {
+            chatbox = chatboxRepository.findByProjectIdAndTaskId(projectId, taskId)
+                    .orElseGet(() -> {
+                        Chatbox newChatbox = new Chatbox();
+                        newChatbox.setTaskId(taskId);
+                        return chatboxRepository.save(newChatbox);
+                    });
+        } else {
+            chatbox = chatboxRepository.findByProjectId(projectId);
+        }
+
+        message.setChatbox(chatbox);
         messageRepository.save(message);
+
         MessageResponse messageResponse = fetchFromClients(message, request.getAuthToken());
         messageResponse.setFakeId(request.getFakeId());
-        messagingTemplate.convertAndSend("/public/project/" + projectId, messageResponse);
+
+        String destination = resolveDestination(projectId, taskId, "");
+        messagingTemplate.convertAndSend(destination, messageResponse);
     }
+
 
     @Override
     public void pinMessage(PinMessageRequest request) {
@@ -51,8 +71,10 @@ public class MessageServiceImpl implements MessageService {
             message.setPinned(!message.isPinned());
             message.setPinTime(LocalDateTime.now());
             messageRepository.save(message);
+
             MessageResponse messageResponse = fetchFromClients(message, request.getAuthToken());
-            messagingTemplate.convertAndSend("/public/project/" + request.getProjectId() + "/pin", messageResponse);
+            String destination = resolveDestination(request.getProjectId(), request.getTaskId(), "/pin");
+            messagingTemplate.convertAndSend(destination, messageResponse);
         }
     }
 
@@ -70,34 +92,46 @@ public class MessageServiceImpl implements MessageService {
             message.getReaderList().add(username);
             messageRepository.save(message);
         }
+
         lastSeenMessageMap.put(message.getId(), Collections.singletonList(username));
-        LastSeenMessageResponse response = LastSeenMessageResponse.builder().lastSeenMessageMap(lastSeenMessageMap).build();
-        messagingTemplate.convertAndSend("/public/project/" + request.getProjectId() + "/read", response);
+        LastSeenMessageResponse response = LastSeenMessageResponse.builder()
+                .lastSeenMessageMap(lastSeenMessageMap)
+                .build();
+
+        String destination = resolveDestination(request.getProjectId(), request.getTaskId(), "/read");
+        messagingTemplate.convertAndSend(destination, response);
     }
 
     @Override
     public void typingMessage(TypingMessageRequest request) {
         TypingResponse response = TypingResponse.builder()
-                                    .username(request.getUsername())
-                                    .isStop(request.getIsStop())
-                                    .build();
-        messagingTemplate.convertAndSend("/public/project/" + request.getProjectId() + "/typing", response);
+                .username(request.getUsername())
+                .isStop(request.getIsStop())
+                .build();
+
+        String destination = resolveDestination(request.getProjectId(), request.getTaskId(), "/typing");
+        messagingTemplate.convertAndSend(destination, response);
     }
 
     @Override
     public void storeMediaMessage(StoreMediaMessageRequest request) {
         FeignRequestContextUtil.setAuthToken(request.getAuthToken());
+
         StoreMediaMessageResponse response = StoreMediaMessageResponse.builder()
-                                            .mediaMessageId(request.getMediaMessageId())
-                                            .success(storageClient.addMediaFromChatToStorage(request.getProjectId(), request.getMediaId()).getStatus() == 200)
-                                            .build();
+                .mediaMessageId(request.getMediaMessageId())
+                .success(storageClient.addMediaFromChatToStorage(request.getProjectId(), request.getMediaId()).getStatus() == 200)
+                .build();
+
         if (response.getSuccess()) {
             Message message = messageRepository.findById(request.getMediaMessageId()).orElse(null);
-            Objects.requireNonNull(message).setInStorage(response.getSuccess());
+            Objects.requireNonNull(message).setInStorage(true);
             messageRepository.save(message);
         }
+
         FeignRequestContextUtil.clear();
-        messagingTemplate.convertAndSend("/public/project/" + request.getProjectId() + "/storage", response);
+
+        String destination = resolveDestination(request.getProjectId(), request.getTaskId(), "/storage");
+        messagingTemplate.convertAndSend(destination, response);
     }
 
     private MessageResponse fetchFromClients(Message message, String authToken) {
@@ -109,7 +143,15 @@ public class MessageServiceImpl implements MessageService {
         if (message.getMediaId() != null) {
             response.setMedia(storageClient.getMediaInfo(message.getMediaId()).getData());
         }
+
         FeignRequestContextUtil.clear();
         return response;
+    }
+
+    private String resolveDestination(Long projectId, Long taskId, String suffix) {
+        if (taskId != null) {
+            return "/public/task/" + taskId + (suffix != null ? suffix : "");
+        }
+        return "/public/project/" + projectId + (suffix != null ? suffix : "");
     }
 }

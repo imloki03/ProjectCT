@@ -40,4 +40,27 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     long countByChatbox_ProjectIdAndContentContainsAndMediaIdNotNull(Long projectId, String content);
 
     long countByChatbox_ProjectIdAndContentContainsAndMediaIdNull(Long projectId, String content);
+
+    Page<Message> findByChatbox_ProjectIdAndChatbox_TaskIdAndSentTimeLessThan(Long projectId, Long taskId, LocalDateTime sentTime, Pageable pageable);
+
+    // For taskId
+    Page<Message> findByChatbox_TaskIdAndIsPinnedTrue(Long taskId, Pageable pageable);
+    long countByChatbox_TaskIdAndIsPinnedTrue(Long taskId);
+
+
+    Page<Message> findByChatbox_TaskIdAndContentContainsAndMediaIdNull(Long taskId, String keyword, Pageable pageable);
+    long countByChatbox_TaskIdAndContentContainsAndMediaIdNull(Long taskId, String keyword);
+
+    Page<Message> findByChatbox_TaskIdAndContentContainsAndMediaIdNotNull(Long taskId, String keyword, Pageable pageable);
+    long countByChatbox_TaskIdAndContentContainsAndMediaIdNotNull(Long taskId, String keyword);
+
+
+    Page<Message> findByChatbox_TaskIdAndSentTimeLessThan(Long taskId, LocalDateTime sentTime, Pageable pageable);
+    Page<Message> findByChatbox_TaskIdAndSentTimeGreaterThan(Long taskId, LocalDateTime sentTime, Pageable pageable);
+
+
+    Page<Message> findByChatbox_TaskIdAndMediaIdNotNull(Long taskId, Pageable pageable);
+    long countByChatbox_TaskIdAndMediaIdNotNull(Long taskId);
+
+    Message findFirstByChatbox_TaskIdAndReaderListContainsOrderBySentTimeDesc(Long taskId, String username);
 }

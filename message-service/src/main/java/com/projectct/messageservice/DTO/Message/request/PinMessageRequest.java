@@ -9,4 +9,5 @@ public class PinMessageRequest {
     Long pinMessageId;
     Long projectId;
     String authToken;
+    Long taskId;
 }

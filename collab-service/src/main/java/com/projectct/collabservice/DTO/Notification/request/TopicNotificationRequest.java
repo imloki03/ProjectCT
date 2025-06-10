@@ -1,4 +1,4 @@
-package com.projectct.notificationservice.DTO.Notification.request;
+package com.projectct.collabservice.DTO.Notification.request;
 
 import lombok.AccessLevel;
 import lombok.Builder;

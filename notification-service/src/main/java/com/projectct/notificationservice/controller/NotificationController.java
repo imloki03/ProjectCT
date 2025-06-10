@@ -3,6 +3,7 @@ package com.projectct.notificationservice.controller;
 import com.projectct.notificationservice.DTO.FCMToken.request.FCMTokenRequest;
 import com.projectct.notificationservice.DTO.RespondData;
 import com.projectct.notificationservice.DTO.Subcribe.request.SubscriptionRequest;
+import com.projectct.notificationservice.DTO.TestMessage.request.TestMessageRequest;
 import com.projectct.notificationservice.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,18 @@ public class NotificationController {
         notificationService.readNotification(notificationId);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
+                .build();
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
+    @PostMapping("/send-test")
+    public ResponseEntity<?> sendTestMessageToTopic(@RequestBody TestMessageRequest request) {
+        String result = notificationService.sendTestMessageToTopic(
+                request.getTopic(), request.getTitle(), request.getBody());
+
+        var respondData = RespondData.builder()
+                .status(HttpStatus.OK.value())
+                .desc(result)
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }

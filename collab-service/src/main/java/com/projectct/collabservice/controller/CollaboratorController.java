@@ -112,13 +112,4 @@ public class CollaboratorController {
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
-    @PutMapping
-    public ResponseEntity<?> inviteCollaborator(@RequestBody DirectNotificationRequest request) {
-        collaboratorService.inviteCollaborator(request);
-        var respondData = RespondData
-                .builder()
-                .status(HttpStatus.OK.value())
-                .build();
-        return new ResponseEntity<>(respondData, HttpStatus.OK);
-    }
 }

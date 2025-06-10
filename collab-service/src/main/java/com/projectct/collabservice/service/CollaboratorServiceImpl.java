@@ -5,6 +5,7 @@ import com.projectct.collabservice.DTO.Collaborator.request.CollabRoleUpdateRequ
 import com.projectct.collabservice.DTO.Collaborator.response.CollabResponse;
 import com.projectct.collabservice.DTO.Collaborator.response.CollabWithoutUserResponse;
 import com.projectct.collabservice.DTO.Notification.request.DirectNotificationRequest;
+import com.projectct.collabservice.DTO.Notification.request.TopicNotificationRequest;
 import com.projectct.collabservice.DTO.User.response.UserResponse;
 import com.projectct.collabservice.constant.DefaultRole;
 import com.projectct.collabservice.constant.KafkaTopic;
@@ -54,6 +55,21 @@ public class CollaboratorServiceImpl implements CollaboratorService{
         Role collabRole = roleRepository.findByProjectIdAndName(collabRequest.getProjectId(), DefaultRole.CONTRIBUTOR);
         newCollab.setRole(collabRole);
         collaboratorRepository.save(newCollab);
+
+        DirectNotificationRequest directNotificationRequest = DirectNotificationRequest.builder()
+                .recipient(collabRequest.getUserId())
+                .projectId(collabRequest.getProjectId())
+                .type(NotificationType.ADD_COLLAB_TO_PROJECT)
+                .tokens(authClient.getUserInfo(collabRequest.getUserId()).getData().getFcmTokens())
+                .build();
+        kafkaProducer.sendMessage(KafkaTopic.USER_DIRECT_NOTIFICATION, directNotificationRequest);
+
+        TopicNotificationRequest topicNotificationRequest = TopicNotificationRequest.builder()
+                .type(NotificationType.ADD_COLLAB_TO_PROJECT)
+                .projectId(collabRequest.getProjectId())
+                .relevantName(authClient.getUserInfo(collabRequest.getUserId()).getData().getName())
+                .build();
+        kafkaProducer.sendMessage(KafkaTopic.TOPIC_NOTIFICATION, topicNotificationRequest);
     }
 
     @Override
@@ -98,13 +114,6 @@ public class CollaboratorServiceImpl implements CollaboratorService{
     }
 
     @Override
-    public void inviteCollaborator(DirectNotificationRequest request) {
-        request.setToken(cachedUserService.getUserInfo(request.getRecipient()).getFcmToken());
-        request.setType(NotificationType.INVITE_NOTIFICATION);
-        kafkaProducer.sendMessage(KafkaTopic.USER_DIRECT_NOTIFICATION, request);
-    }
-
-    @Override
     public CollabWithoutUserResponse getCurrentCollab(Long currentProjectId) {
         Collaborator collaborator = collaboratorRepository.findByProjectIdAndUserId(currentProjectId, webUtil.getCurrentIdUser());
         if (collaborator==null) {
@@ -130,8 +139,8 @@ public class CollaboratorServiceImpl implements CollaboratorService{
     @Transactional
     @Override
     public void deleteCollaborator(Long collabId) {
-        if (!taskClient.getAssignedTask(collabId).getData().isEmpty())
-            throw new AppException(HttpStatus.BAD_REQUEST, MessageKey.COLLAB_DELETE_ASSIGNED);
+//        if (!taskClient.getAssignedTask(collabId).getData().isEmpty())
+//            throw new AppException(HttpStatus.BAD_REQUEST, MessageKey.COLLAB_DELETE_ASSIGNED);
 
         Collaborator collaborator = collaboratorRepository.findById(collabId).orElse(null);
         if (collaborator==null) {

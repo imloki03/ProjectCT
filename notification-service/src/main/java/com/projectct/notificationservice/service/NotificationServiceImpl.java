@@ -62,4 +62,23 @@ public class NotificationServiceImpl implements NotificationService {
         }
         return "Successfully unsubscribed from topic: " + request.getTopics().getFirst();
     }
+
+    @Override
+    public String sendTestMessageToTopic(String topic, String title, String body) {
+        Message message = Message.builder()
+                .setNotification(Notification.builder()
+                        .setTitle(title)
+                        .setBody(body)
+                        .build())
+                .setTopic(topic)
+                .build();
+
+        try {
+            String response = firebaseMessaging.send(message);
+            return "Message sent successfully: " + response;
+        } catch (FirebaseMessagingException e) {
+            log.error("Failed to send message to topic {}", topic, e);
+            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send message.");
+        }
+    }
 }

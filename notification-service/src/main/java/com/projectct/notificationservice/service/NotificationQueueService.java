@@ -1,9 +1,11 @@
 package com.projectct.notificationservice.service;
 
 import com.projectct.notificationservice.DTO.Notification.response.NotificationResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface NotificationQueueService {
-    List<NotificationResponse> getAllNotificationOfUser(Long userId);
+    Page<NotificationResponse> getAllReadNotificationOfUser(Long userId, Pageable pageable);
+
+    Page<NotificationResponse> getAllUnReadNotificationOfUser(Long userId, Pageable pageable);
 }

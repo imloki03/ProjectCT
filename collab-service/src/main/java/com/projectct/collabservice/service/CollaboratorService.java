@@ -22,7 +22,5 @@ public interface CollaboratorService {
 
     CollabResponse getCollab(Long collabId);
 
-    void inviteCollaborator(DirectNotificationRequest userId);
-
     CollabWithoutUserResponse getCurrentCollab(Long currentProjectId);
 }

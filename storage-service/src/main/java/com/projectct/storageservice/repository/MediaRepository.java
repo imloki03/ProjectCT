@@ -13,4 +13,6 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
     List<Media> findByStorageAndNewerVersionNull(Storage storage, Pageable pageable);
 
     long countByStorageAndPreviousVersionNull(Storage storage);
+
+    List<Media> findByStorage_ProjectIdAndNameContains(Long projectId, String name, Pageable pageable);
 }

@@ -154,6 +154,26 @@ public class StorageServiceImpl implements StorageService{
         mediaRepository.save(currentMedia);
     }
 
+    @Override
+    public MediaPagingResponse searchMedia(Long projectId, String keyword, Pageable pageable) {
+        Storage storage = storageRepository.findByProjectId(projectId);
+        if (storage == null)
+            throw new AppException(HttpStatus.NOT_FOUND, MessageUtil.getMessage(MessageKey.STORAGE_NOT_FOUND));
+        List<Media> mainMediaList = mediaRepository.findByStorage_ProjectIdAndNameContains(projectId, keyword, pageable);
+
+        List<Media> previousVersionsList = mainMediaList.stream()
+                .filter(media -> media.getPreviousVersion() != null)
+                .flatMap(media -> getPreviousVersionList(media.getPreviousVersion()).stream())
+                .toList();
+
+        long totalMediaCount = mediaRepository.countByStorageAndPreviousVersionNull(storage);
+
+        return MediaPagingResponse.builder()
+                .mediaList(new PageImpl<>(mediaMapper.toMediaResponseList(mainMediaList), pageable, totalMediaCount))
+                .additionalMediaList(mediaMapper.toMediaResponseList(previousVersionsList))
+                .build();
+    }
+
     public MediaType convertFilenameToMediaType(String filename) {
         String extension = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
         return switch (extension) {

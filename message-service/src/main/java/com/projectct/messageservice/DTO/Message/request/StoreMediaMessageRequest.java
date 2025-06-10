@@ -10,5 +10,6 @@ public class StoreMediaMessageRequest {
     Long mediaMessageId;
     Long mediaId;
     Long projectId;
+    Long taskId;
     String authToken;
 }

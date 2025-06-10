@@ -26,9 +26,11 @@ public class ChatboxController {
 
     @GetMapping("p/{projectId}")
     public ResponseEntity<?> getOlderMessageByProject(
-                            @RequestParam(required = false, defaultValue = "0") Long last,
-                            @PathVariable Long projectId, Pageable pageable) {
-        Page<MessageResponse> messages = chatboxService.getOlderMessageByProject(projectId, last, pageable);
+            @RequestParam(required = false, defaultValue = "0") Long last,
+            @PathVariable Long projectId,
+            @RequestParam(required = false) Long taskId,
+            Pageable pageable) {
+        Page<MessageResponse> messages = chatboxService.getOlderMessageByProject(projectId, last, taskId, pageable);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .data(messages)
@@ -39,8 +41,10 @@ public class ChatboxController {
     @GetMapping("p/{projectId}/newer")
     public ResponseEntity<?> getNewerMessageByProject(
             @RequestParam(required = false, defaultValue = "0") Long last,
-            @PathVariable Long projectId, Pageable pageable) {
-        Page<MessageResponse> messages = chatboxService.getNewerMessageByProject(projectId, last, pageable);
+            @PathVariable Long projectId,
+            @RequestParam(required = false) Long taskId,
+            Pageable pageable) {
+        Page<MessageResponse> messages = chatboxService.getNewerMessageByProject(projectId, last, taskId, pageable);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .data(messages)
@@ -50,8 +54,10 @@ public class ChatboxController {
 
     @GetMapping("p/{projectId}/media")
     public ResponseEntity<?> getMediaMessageByProject(
-            @PathVariable Long projectId, Pageable pageable) {
-        Page<MessageResponse> messages = chatboxService.getMediaMessageByProject(projectId, pageable);
+            @PathVariable Long projectId,
+            @RequestParam(required = false) Long taskId,
+            Pageable pageable) {
+        Page<MessageResponse> messages = chatboxService.getMediaMessageByProject(projectId, taskId, pageable);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .data(messages)
@@ -61,8 +67,11 @@ public class ChatboxController {
 
     @GetMapping("p/{projectId}/m/{messageId}/media/src")
     public ResponseEntity<?> getSourceMessage(
-            @PathVariable Long projectId, @PathVariable Long messageId, Pageable pageable) {
-        MessageSourceResponse messages = chatboxService.getSourceMessage(projectId, messageId, pageable);
+            @PathVariable Long projectId,
+            @PathVariable Long messageId,
+            @RequestParam(required = false) Long taskId,
+            Pageable pageable) {
+        MessageSourceResponse messages = chatboxService.getSourceMessage(projectId, messageId, taskId, pageable);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .data(messages)
@@ -72,10 +81,12 @@ public class ChatboxController {
 
     @GetMapping("p/{projectId}/seen")
     public ResponseEntity<?> getLastSeenMessageByProject(
-            @RequestParam String usernameList, @PathVariable Long projectId) {
+            @RequestParam String usernameList,
+            @PathVariable Long projectId,
+            @RequestParam(required = false) Long taskId) {
 
         List<String> usernames = Arrays.asList(usernameList.split(","));
-        LastSeenMessageResponse response = chatboxService.getLastSeenMessageByProject(usernames, projectId);
+        LastSeenMessageResponse response = chatboxService.getLastSeenMessageByProject(usernames, projectId, taskId);
 
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
@@ -86,18 +97,26 @@ public class ChatboxController {
     }
 
     @GetMapping("p/{projectId}/pin")
-    public ResponseEntity<?> getPinnedMessagesByProject(@PathVariable Long projectId, Pageable pageable) {
-        Page<MessageResponse> messages = chatboxService.getPinnedMessagesByProject(projectId, pageable);
+    public ResponseEntity<?> getPinnedMessagesByProject(
+            @PathVariable Long projectId,
+            @RequestParam(required = false) Long taskId,
+            Pageable pageable) {
+        Page<MessageResponse> messages = chatboxService.getPinnedMessagesByProject(projectId, taskId, pageable);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
-                .data(messages) // Include pagination metadata if needed
+                .data(messages)
                 .build();
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
     @GetMapping("search/p/{projectId}")
-    public ResponseEntity<?> searchMessages(@PathVariable Long projectId, @RequestParam String keyword, @RequestParam String mode, Pageable pageable) {
-        Page<MessageResponse> messages = chatboxService.searchMessages(projectId, keyword, mode, pageable);
+    public ResponseEntity<?> searchMessages(
+            @PathVariable Long projectId,
+            @RequestParam String keyword,
+            @RequestParam String mode,
+            @RequestParam(required = false) Long taskId,
+            Pageable pageable) {
+        Page<MessageResponse> messages = chatboxService.searchMessages(projectId, keyword, mode, taskId, pageable);
         var respondData = RespondData.builder()
                 .status(HttpStatus.OK.value())
                 .data(messages)

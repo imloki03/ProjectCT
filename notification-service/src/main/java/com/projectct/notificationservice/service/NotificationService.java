@@ -8,4 +8,6 @@ public interface NotificationService {
     void readNotification(Long notificationId);
 
     String unsubscribeToTopic(SubscriptionRequest request);
+
+    String sendTestMessageToTopic(String topic, String title, String body);
 }

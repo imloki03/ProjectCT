@@ -16,4 +16,5 @@ public interface StorageService {
     MediaResponse updateMediaVersion(Long mediaId, MediaRequest request);
     void deleteMedia(Long mediaId);
     void addMediaFromChatToStorage(Long projectId, Long mediaId);
+    MediaPagingResponse searchMedia(Long projectId, String keyword, Pageable pageable);
 }
