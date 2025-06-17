@@ -27,10 +27,8 @@ public class Message {
     private boolean inStorage;
     private LocalDateTime pinTime;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "message_reader", joinColumns = @JoinColumn(name = "message_id"))
-    @Column(name = "reader_username")
-    private List<String> readerList;
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<MessageReader> readerList;
 
     private Long mediaId;
 

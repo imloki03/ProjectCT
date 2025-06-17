@@ -121,9 +121,9 @@ public class ChatboxServiceImpl implements ChatboxService {
         for (String username : usernameList) {
             Message message;
             if (taskId != null) {
-                message = messageRepository.findFirstByChatbox_TaskIdAndReaderListContainsOrderBySentTimeDesc(taskId, username);
+                message = messageRepository.findFirstByChatbox_TaskIdAndReaderList_ReaderUsernameOrderBySentTimeDesc(projectId, username);
             } else {
-                message = messageRepository.findFirstByChatbox_ProjectIdAndReaderListContainsOrderBySentTimeDesc(projectId, username);
+                message = messageRepository.findFirstByChatbox_ProjectIdAndReaderList_ReaderUsernameOrderBySentTimeDesc(projectId, username);
             }
 
             if (message != null) {
