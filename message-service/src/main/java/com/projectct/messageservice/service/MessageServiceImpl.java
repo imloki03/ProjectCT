@@ -8,6 +8,7 @@ import com.projectct.messageservice.DTO.Message.response.TypingResponse;
 import com.projectct.messageservice.mapper.MessageMapper;
 import com.projectct.messageservice.model.Chatbox;
 import com.projectct.messageservice.model.Message;
+import com.projectct.messageservice.model.MessageReader;
 import com.projectct.messageservice.repository.ChatboxRepository;
 import com.projectct.messageservice.repository.MessageRepository;
 import com.projectct.messageservice.repository.httpclient.AuthClient;
@@ -88,8 +89,15 @@ public class MessageServiceImpl implements MessageService {
             return;
         }
 
-        if (!message.getReaderList().contains(username)) {
-            message.getReaderList().add(username);
+        boolean alreadyRead = message.getReaderList().stream()
+                .anyMatch(reader -> reader.getReaderUsername().equals(username));
+
+        if (!alreadyRead) {
+            MessageReader reader = MessageReader.builder()
+                    .readerUsername(username)
+                    .message(message)
+                    .build();
+            message.getReaderList().add(reader);
             messageRepository.save(message);
         }
 

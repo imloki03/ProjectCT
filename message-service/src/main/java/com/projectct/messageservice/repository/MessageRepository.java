@@ -25,7 +25,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     Page<Message> findByChatbox_ProjectIdAndSentTimeGreaterThan(Long projectId, LocalDateTime sentTime, Pageable pageable);
 
-    Message findFirstByChatbox_ProjectIdAndReaderListContainsOrderBySentTimeDesc(Long projectId, String readerList);
+//    Message findFirstByChatbox_ProjectIdAndReaderListContainsOrderBySentTimeDesc(Long projectId, String readerList);
 
     long countByChatbox_ProjectIdAndIsPinnedTrue(Long projectId);
 
@@ -62,5 +62,9 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     Page<Message> findByChatbox_TaskIdAndMediaIdNotNull(Long taskId, Pageable pageable);
     long countByChatbox_TaskIdAndMediaIdNotNull(Long taskId);
 
-    Message findFirstByChatbox_TaskIdAndReaderListContainsOrderBySentTimeDesc(Long taskId, String username);
+//    Message findFirstByChatbox_TaskIdAndReaderListContainsOrderBySentTimeDesc(Long taskId, String username);
+
+    Message findFirstByChatbox_TaskIdAndReaderList_ReaderUsernameOrderBySentTimeDesc(Long taskId, String readerUsername);
+
+    Message findFirstByChatbox_ProjectIdAndReaderList_ReaderUsernameOrderBySentTimeDesc(Long projectId, String readerUsername);
 }
