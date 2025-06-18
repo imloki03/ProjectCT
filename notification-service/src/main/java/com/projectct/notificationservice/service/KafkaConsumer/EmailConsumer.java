@@ -24,7 +24,7 @@ public class EmailConsumer {
     public void sendEmail(String request) {
         EmailRequest requestEmail = objectMapperUtil.deserializeFromJson(request, EmailRequest.class);
         try {
-            emailUtil.sendEmail(requestEmail.getReceiver(), requestEmail.getSubject(), requestEmail.getTemplateName(), requestEmail.getArgs());
+            emailUtil.sendEmail(requestEmail.getReceiver(), requestEmail.getSubject(), requestEmail.getTemplateName(), requestEmail.getArgs().toArray());
         } catch (IOException | MessagingException e) {
             throw new RuntimeException(e);
         }

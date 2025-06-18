@@ -1,10 +1,14 @@
 package com.projectct.projectservice.service;
 
+import com.projectct.projectservice.DTO.Email.request.EmailRequest;
 import com.projectct.projectservice.DTO.Media.response.MediaResponse;
 import com.projectct.projectservice.DTO.Task.request.TaskRequest;
 import com.projectct.projectservice.DTO.Task.request.UpdateTaskRequest;
 import com.projectct.projectservice.DTO.Task.request.UpdateTaskStatusRequest;
 import com.projectct.projectservice.DTO.Task.response.*;
+import com.projectct.projectservice.DTO.User.response.UserResponse;
+import com.projectct.projectservice.constant.HTMLTemplate;
+import com.projectct.projectservice.constant.KafkaTopic;
 import com.projectct.projectservice.constant.MessageKey;
 import com.projectct.projectservice.enums.Status;
 import com.projectct.projectservice.exception.AppException;
@@ -20,6 +24,7 @@ import com.projectct.projectservice.repository.TaskRepository;
 import com.projectct.projectservice.repository.httpclient.CollabClient;
 import com.projectct.projectservice.repository.httpclient.MediaClient;
 import com.projectct.projectservice.util.JwtUtil;
+import com.projectct.projectservice.util.KafkaProducer;
 import com.projectct.projectservice.util.MessageUtil;
 import com.projectct.projectservice.util.WebUtil;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +55,8 @@ public class TaskServiceImpl implements TaskService{
     final CollabClient collabClient;
     final MediaClient mediaClient;
     final WebUtil webUtil;
+    final KafkaProducer kafkaProducer;
+
     @Transactional
     @Override
     public TaskResponse createNewTask(Long projectId, TaskRequest request) {
@@ -287,8 +294,30 @@ public class TaskServiceImpl implements TaskService{
         assignAllSubTask(task, collabId);
         assignToParentTask(task, collabId);
         taskRepository.save(task);
+
+        UserResponse user = collabClient.getCollabById(collabId).getData().getUser();
+        String email = user.getEmail();
+        Project p = task.getBacklog() != null ? task.getBacklog().getProject() : task.getPhase().getProject();
+        List<Object> args = new ArrayList<>();
+
+        args.add(user.getName());
+        args.add(p.getName());
+        args.add(task.getName());
+        args.add(task.getDescription());
+        args.add(task.getStartTime().toString());
+        args.add(task.getEndTime().toString());
+
+        String subject = "Task Assignment";
+        kafkaProducer.sendMessage(KafkaTopic.SEND_EMAIL , EmailRequest.builder()
+                .receiver(email)
+                .subject(subject)
+                .templateName(HTMLTemplate.ASSIGN_TASK)
+                .args(args)
+                .build());
+
         return taskMapper.toTaskResponse(task);
     }
+
     public void assignToParentTask(Task task, Long collabId) {
         if (countTheSameLevelSubTask(task) == 1){
             Task parentTask = task.getParentTask();
